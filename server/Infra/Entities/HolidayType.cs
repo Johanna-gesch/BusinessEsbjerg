@@ -2,6 +2,6 @@
 
 public enum HolidayType
 {
-    Admin,
-    Employee
+    Week1_5,
+    Week6
 }
