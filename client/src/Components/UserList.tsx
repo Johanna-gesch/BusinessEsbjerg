@@ -18,7 +18,22 @@ export function UserList({users, setUsers}: UsersListProps) {
         });
     }, []);
 
-    
+    function handleEditOrSaveUser(user: User) {
+        if (editingUserId === user.userId) {
+            MyApi.updateUser.userUpdateUser({
+                userId: user.userId,
+                username: user.username,
+            })
+                .then(() => setEditingUserId(null))
+                .then(() => {
+                    MyApi.getUsers.userGetUsers().then(r => {
+                        setUsers(r);
+                    });
+                });
+        } else {
+            setEditingUserId(user.userId);
+        }
+    }
 
     return (
         <div>
@@ -27,7 +42,23 @@ export function UserList({users, setUsers}: UsersListProps) {
                     key={user.userId}
                 >
                     <div>
-                        {user.username}
+                        {editingUserId === user.userId ? (
+                            <input
+                                value={user.username}
+                                onChange={e => {
+                                    setUsers(users.map(u =>
+                                    u.userId === user.userId
+                                        ? {...u, username: e.target.value}
+                                        : u
+                                    ));
+                                }}
+                            />
+                        ) : (
+                            <>{user.username}</>
+                        )}
+                        <button onClick={() => handleEditOrSaveUser(user)}>
+                            {editingUserId === user.userId ? "Save" : "Edit"}
+                        </button>
                     </div>
                 </div>
             ))}

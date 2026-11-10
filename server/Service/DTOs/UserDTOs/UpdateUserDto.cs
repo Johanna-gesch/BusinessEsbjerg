@@ -1,6 +1,6 @@
 ﻿using LinqToDB.Mapping;
 
-namespace Service;
+namespace Service.DTOs.UserDTOs;
 
 public class UpdateUserDto
 {
