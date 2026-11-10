@@ -1,4 +1,6 @@
 ﻿using Infra.Entities;
+using Infra.Repositories.Interfaces;
+using LinqToDB;
 using LinqToDB.Async;
 
 namespace Infra.Repositories;
@@ -10,14 +12,14 @@ public class UserRepo(MyDatabaseConnection dc) : IUserRepo
         throw new NotImplementedException();
     }
 
-    public Task<User> GetById(string id)
+    public async Task<User?> GetById(string id)
     {
-        throw new NotImplementedException();
+        return await dc.Users.FirstOrDefaultAsync(u => u.UserId == id);
     }
 
-    public Task Update(User user)
+    public async Task Update(User user)
     {
-        throw new NotImplementedException();
+        await dc.UpdateAsync(user);
     }
 
     public Task Delete(User user)

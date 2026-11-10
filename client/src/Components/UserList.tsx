@@ -1,5 +1,5 @@
 import {Api, type User} from "@/api/Api.ts";
-import {type Dispatch, type SetStateAction, useEffect} from "react";
+import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
 
 export const MyApi = new Api();
 
@@ -10,11 +10,15 @@ type UsersListProps = {
 
 export function UserList({users, setUsers}: UsersListProps) {
 
+    const [editingUserId, setEditingUserId] = useState<string | null>(null);
+
     useEffect(() => {
         MyApi.getUsers.userGetUsers().then(r => {
             setUsers(r);
         });
     }, []);
+
+    
 
     return (
         <div>
