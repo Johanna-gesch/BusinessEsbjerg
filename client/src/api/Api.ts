@@ -29,6 +29,15 @@ export interface UpdateUserDto {
   username: string;
 }
 
+export interface LoginResponseDTO {
+  token: string;
+}
+
+export interface LoginRequestDTO {
+  username: string;
+  password: string;
+}
+
 export interface UserGetUserByIdParams {
   id?: string;
 }
@@ -307,12 +316,14 @@ export class Api<
      * @tags User
      * @name UserCreateUser
      * @request POST:/CreateUser
+     * @secure
      */
     userCreateUser: (data: CreateUserDto, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/CreateUser`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -324,11 +335,13 @@ export class Api<
      * @tags User
      * @name UserGetUsers
      * @request GET:/GetUsers
+     * @secure
      */
     userGetUsers: (params: RequestParams = {}) =>
       this.request<User[], any>({
         path: `/GetUsers`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -340,6 +353,7 @@ export class Api<
      * @tags User
      * @name UserGetUserById
      * @request GET:/GetUserById
+     * @secure
      */
     userGetUserById: (
       query: UserGetUserByIdParams = {},
@@ -349,6 +363,7 @@ export class Api<
         path: `/GetUserById`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -360,12 +375,14 @@ export class Api<
      * @tags User
      * @name UserUpdateUser
      * @request PUT:/UpdateUser
+     * @secure
      */
     userUpdateUser: (data: UpdateUserDto, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/UpdateUser`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -377,6 +394,7 @@ export class Api<
      * @tags User
      * @name UserDeleteUser
      * @request DELETE:/DeleteUser
+     * @secure
      */
     userDeleteUser: (
       query: UserDeleteUserParams = {},
@@ -386,6 +404,27 @@ export class Api<
         path: `/DeleteUser`,
         method: "DELETE",
         query: query,
+        secure: true,
+        ...params,
+      }),
+  };
+  login = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserLogin
+     * @request POST:/login
+     * @secure
+     */
+    userLogin: (data: LoginRequestDTO, params: RequestParams = {}) =>
+      this.request<LoginResponseDTO, any>({
+        path: `/login`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

@@ -1,12 +1,12 @@
-using Infra;
+﻿using Infra;
 using Infra.Entities;
 using Service.DTOs.UserDTOs;
 using Infra.Repositories.Interfaces;
-using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
+using Service.Security;
 
 namespace Service;
 
-public class UserService(IUserRepo repo)
+public class UserService(IUserRepo repo, IPasswordHasher hasher)
 {
     public async Task<List<User>> GetAll() {
         return await repo.GetAll();
@@ -30,7 +30,7 @@ public class UserService(IUserRepo repo)
         {
             UserId = Guid.NewGuid().ToString(),
             Username = dto.Username,
-            PasswordHash = dto.Password,
+            PasswordHash = hasher.HashAndSaltPassword(dto.Password),
             IsAdmin = dto.IsAdmin,
         };
         await repo.Insert(newUser);

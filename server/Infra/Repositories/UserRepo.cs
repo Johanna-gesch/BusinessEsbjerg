@@ -36,4 +36,9 @@ public class UserRepo(MyDatabaseConnection dc) : IUserRepo
             .Where(u => u.IsActive)
             .ToListAsync();
     }
+
+    public async Task<User?> GetByUsername(string username)
+    {
+        return await dc.Users.FirstOrDefaultAsync(u => u.Username == username);
+    }
 }

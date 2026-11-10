@@ -1,7 +1,8 @@
 import {Api, type User} from "@/api/Api.ts";
 import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
+import apiClient from "@/services/ApiClient";
 
-export const MyApi = new Api();
+const MyApi = apiClient.api;
 
 type UsersListProps = {
     users: User[];

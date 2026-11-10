@@ -1,12 +1,16 @@
 ﻿using Infra.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using Service.DTOs.LoginDTOs;
 using Service.DTOs.UserDTOs;
 
 namespace API.Controllers;
 
-public class UserController(UserService service) : ControllerBase
+[ApiController]
+public class UserController(UserService service, IAuthenticationService authenticationService) : ControllerBase
 {
+    [Authorize(Policy = "admin")]
     [HttpPost(nameof(CreateUser))]
     public async Task CreateUser([FromBody] CreateUserDto dto)
     {
@@ -36,5 +40,26 @@ public class UserController(UserService service) : ControllerBase
     {
         await service.Delete(userId);
     }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResponseDTO>> Login([FromBody]
+        LoginRequestDTO request)
+    {
+        string? token = await authenticationService.Login(
+            request.Username,
+            request.Password);
+
+        if (token == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(new LoginResponseDTO
+        {
+            Token = token
+        });
+    }
+    
+    
     
 }
