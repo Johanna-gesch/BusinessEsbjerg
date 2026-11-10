@@ -10,6 +10,13 @@
  * ---------------------------------------------------------------
  */
 
+export interface User {
+  userId: string;
+  username: string;
+  passwordHash: string;
+  isAdmin: boolean;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -272,4 +279,21 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<
   SecurityDataType extends unknown,
-> extends HttpClient<SecurityDataType> {}
+> extends HttpClient<SecurityDataType> {
+  getUsers = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserGetUsers
+     * @request GET:/GetUsers
+     */
+    userGetUsers: (params: RequestParams = {}) =>
+      this.request<User[], any>({
+        path: `/GetUsers`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+}
