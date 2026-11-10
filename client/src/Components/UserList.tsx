@@ -35,6 +35,22 @@ export function UserList({users, setUsers}: UsersListProps) {
         }
     }
 
+    function handleDeleteUser(userId: string) {
+        if (!window.confirm("Are you sure you want to delete this user?")) {
+            return;
+        }
+
+        MyApi.deleteUser.userDeleteUser({
+            userId: userId
+        })
+            .then(() => {
+                setUsers(users.filter(user => user.userId !== userId));
+            })
+            .catch(error => {
+                console.error("Failed to delete user:", error);
+            });
+    }
+
     return (
         <div>
             {users.map(user => (
@@ -58,6 +74,10 @@ export function UserList({users, setUsers}: UsersListProps) {
                         )}
                         <button onClick={() => handleEditOrSaveUser(user)}>
                             {editingUserId === user.userId ? "Save" : "Edit"}
+                        </button>
+
+                        <button onClick={() => handleDeleteUser(user.userId)}>
+                            Delete
                         </button>
                     </div>
                 </div>

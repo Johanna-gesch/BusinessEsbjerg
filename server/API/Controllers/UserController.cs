@@ -30,5 +30,11 @@ public class UserController(UserService service) : ControllerBase
     {
         await service.Update(dto);
     }
+
+    [HttpDelete(nameof(DeleteUser))]
+    public async Task DeleteUser(string userId)
+    {
+        await service.Delete(userId);
+    }
     
 }
