@@ -17,6 +17,15 @@ export interface User {
   isAdmin: boolean;
 }
 
+export interface UpdateUserDto {
+  userId: string;
+  username: string;
+}
+
+export interface UserGetUserByIdParams {
+  id?: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -293,6 +302,43 @@ export class Api<
         path: `/GetUsers`,
         method: "GET",
         format: "json",
+        ...params,
+      }),
+  };
+  getUserById = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserGetUserById
+     * @request GET:/GetUserById
+     */
+    userGetUserById: (
+      query: UserGetUserByIdParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<User, any>({
+        path: `/GetUserById`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+  };
+  updateUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserUpdateUser
+     * @request PUT:/UpdateUser
+     */
+    userUpdateUser: (data: UpdateUserDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/UpdateUser`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
   };

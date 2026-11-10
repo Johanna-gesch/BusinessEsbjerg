@@ -18,5 +18,17 @@ public class UserController(UserService service) : ControllerBase
     {
         return await service.GetAll();
     }
+
+    [HttpGet(nameof(GetUserById))]
+    public async Task<User> GetUserById(string id)
+    {
+        return await service.GetById(id);
+    }
+
+    [HttpPut(nameof(UpdateUser))]
+    public async Task UpdateUser([FromBody]UpdateUserDto dto)
+    {
+        await service.Update(dto);
+    }
     
 }
