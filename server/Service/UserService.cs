@@ -20,20 +20,7 @@ public class UserService(IUserRepo repo)
         return await repo.GetById(id)
             ?? throw new NotFoundException($"User with this id '{id}' not found");
     }
-
-    public async Task Update(UpdateUserDto dto)
-    {
-        var user = await repo.GetById(dto.UserId)
-            ?? throw new ValidationException("User not found");
-
-        if (!string.IsNullOrWhiteSpace(dto.Username))
-            user.Username = dto.Username;
-        
-        await repo.Update(user);
-    }
     
-    
-
     public async Task Insert(CreateUserDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -47,5 +34,26 @@ public class UserService(IUserRepo repo)
             IsAdmin = dto.IsAdmin,
         };
         await repo.Insert(newUser);
+    }
+    
+    public async Task Update(UpdateUserDto dto)
+    {
+        var user = await repo.GetById(dto.UserId)
+                   ?? throw new ValidationException("User not found");
+
+        if (!string.IsNullOrWhiteSpace(dto.Username))
+            user.Username = dto.Username;
+        
+        await repo.Update(user);
+    }
+
+    public async Task Delete(string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new Infra.ValidationException("User id cannot be null or empty");
+
+        var user = await repo.GetById(userId) ?? throw new NotFoundException($"User with id '{userId}' not found");
+
+        await repo.Delete(user);
     }
 }

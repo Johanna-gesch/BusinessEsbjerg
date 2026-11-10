@@ -21,6 +21,7 @@ export interface User {
   username: string;
   passwordHash: string;
   isAdmin: boolean;
+  isActive: boolean;
 }
 
 export interface UpdateUserDto {
@@ -30,6 +31,10 @@ export interface UpdateUserDto {
 
 export interface UserGetUserByIdParams {
   id?: string;
+}
+
+export interface UserDeleteUserParams {
+  userId?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -362,6 +367,25 @@ export class Api<
         method: "PUT",
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+  };
+  deleteUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserDeleteUser
+     * @request DELETE:/DeleteUser
+     */
+    userDeleteUser: (
+      query: UserDeleteUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/DeleteUser`,
+        method: "DELETE",
+        query: query,
         ...params,
       }),
   };

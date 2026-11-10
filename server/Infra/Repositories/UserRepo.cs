@@ -23,13 +23,17 @@ public class UserRepo(MyDatabaseConnection dc) : IUserRepo
         await dc.UpdateAsync(user);
     }
 
-    public Task Delete(User user)
+    public async Task Delete(User user)
     {
-        throw new NotImplementedException();
+        user.IsActive = false;
+
+        await dc.UpdateAsync(user);
     }
 
     public async Task<List<User>> GetAll()
     {
-        return await dc.Users.ToListAsync();
+        return await dc.Users
+            .Where(u => u.IsActive)
+            .ToListAsync();
     }
 }
