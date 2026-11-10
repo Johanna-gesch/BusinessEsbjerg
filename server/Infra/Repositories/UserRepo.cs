@@ -29,4 +29,9 @@ public class UserRepo(MyDatabaseConnection dc) : IUserRepo
     {
         return await dc.Users.ToListAsync();
     }
+
+    public Task<User?> GetByUsername(string username)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -17,6 +17,15 @@ export interface User {
   isAdmin: boolean;
 }
 
+export interface LoginResponseDTO {
+  token: string;
+}
+
+export interface LoginRequestDTO {
+  username: string;
+  password: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -287,11 +296,33 @@ export class Api<
      * @tags User
      * @name UserGetUsers
      * @request GET:/GetUsers
+     * @secure
      */
     userGetUsers: (params: RequestParams = {}) =>
       this.request<User[], any>({
         path: `/GetUsers`,
         method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  login = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserLogin
+     * @request POST:/login
+     * @secure
+     */
+    userLogin: (data: LoginRequestDTO, params: RequestParams = {}) =>
+      this.request<LoginResponseDTO, any>({
+        path: `/login`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

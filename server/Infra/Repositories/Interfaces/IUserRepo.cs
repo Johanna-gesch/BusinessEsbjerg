@@ -9,4 +9,5 @@ public interface IUserRepo
     Task Update(User user);
     Task Delete(User user);
     Task<List<User>> GetAll();
+    Task<User?> GetByUsername(string username);
 }

@@ -10,7 +10,7 @@ namespace Service.Security;
 
 public class TokenService (IConfiguration configuration) : ITokenService
 {
-    private const string Issuer = "seqrity-api";
+    private const string Issuer = "security-api";
     private const string Audience = "security-api";
     private readonly SymmetricSecurityKey _key = new(Encoding.UTF8.GetBytes(
         configuration["JwtSecret"] ?? throw new InvalidOperationException("JwtSecret is missing.")));
@@ -19,17 +19,11 @@ public class TokenService (IConfiguration configuration) : ITokenService
     {
         Claim[] claims =
         [
-            new Claim(
-                ClaimTypes.NameIdentifier,
-                user.UserId),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId),
 
-            new Claim(
-                ClaimTypes.Name,
-                user.Username),
+            new Claim(ClaimTypes.Name, user.Username),
 
-            new Claim(
-                ClaimTypes.Role,
-                user.IsAdmin.ToString())
+            new Claim("isAdmin", user.IsAdmin.ToString().ToLower())
         ];
 
         var token = new JwtSecurityToken(
