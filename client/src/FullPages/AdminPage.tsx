@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type {User} from "@/api/Api.ts";
 import {UserList} from "@/Components/UserList.tsx";
+import {CreateUserForm} from "@/Components/CreateUserForm.tsx";
 
 
 export function AdminPage() {
@@ -9,6 +10,7 @@ export function AdminPage() {
     return (
         <div>
             <UserList users={users} setUsers={setUsers} />
+            <CreateUserForm />
         </div>
     )
 }

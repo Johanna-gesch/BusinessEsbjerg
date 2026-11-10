@@ -1,33 +1,40 @@
 ﻿using Infra.Entities;
+using Infra.Repositories.Interfaces;
+using LinqToDB;
 using LinqToDB.Async;
+using LinqToDB;
 
 namespace Infra.Repositories;
 
 public class UserRepo(MyDatabaseConnection dc) : IUserRepo
 {
-    public Task Insert(User user)
+    public async Task Insert(User user)
     {
-        throw new NotImplementedException();
+        await dc.InsertAsync(user);
     }
 
-    public Task<User> GetById(string id)
+    public async Task<User?> GetById(string id)
     {
-        throw new NotImplementedException();
+        return await dc.Users.FirstOrDefaultAsync(u => u.UserId == id);
     }
 
-    public Task Update(User user)
+    public async Task Update(User user)
     {
-        throw new NotImplementedException();
+        await dc.UpdateAsync(user);
     }
 
-    public Task Delete(User user)
+    public async Task Delete(User user)
     {
-        throw new NotImplementedException();
+        user.IsActive = false;
+
+        await dc.UpdateAsync(user);
     }
 
     public async Task<List<User>> GetAll()
     {
-        return await dc.Users.ToListAsync();
+        return await dc.Users
+            .Where(u => u.IsActive)
+            .ToListAsync();
     }
 
     public Task<User?> GetByUsername(string username)

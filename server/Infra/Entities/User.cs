@@ -8,4 +8,5 @@ public class User
     [Column] public string Username { get; set; } = "";
     [Column] public string PasswordHash { get; set; } = "";
     [Column] public bool IsAdmin { get; set; } = false;
+    [Column] public bool IsActive { get; set; } = true;
 }

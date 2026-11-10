@@ -10,11 +10,31 @@
  * ---------------------------------------------------------------
  */
 
+export interface CreateUserDto {
+  username: string;
+  password: string;
+  isAdmin: boolean;
+}
+
 export interface User {
   userId: string;
   username: string;
   passwordHash: string;
   isAdmin: boolean;
+  isActive: boolean;
+}
+
+export interface UpdateUserDto {
+  userId: string;
+  username: string;
+}
+
+export interface UserGetUserByIdParams {
+  id?: string;
+}
+
+export interface UserDeleteUserParams {
+  userId?: string;
 }
 
 export interface LoginResponseDTO {
@@ -289,6 +309,23 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
+  createUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserCreateUser
+     * @request POST:/CreateUser
+     */
+    userCreateUser: (data: CreateUserDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/CreateUser`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
   getUsers = {
     /**
      * No description
@@ -324,6 +361,62 @@ export class Api<
         secure: true,
         type: ContentType.Json,
         format: "json",
+        ...params,
+      }),
+  };
+  getUserById = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserGetUserById
+     * @request GET:/GetUserById
+     */
+    userGetUserById: (
+      query: UserGetUserByIdParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<User, any>({
+        path: `/GetUserById`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+  };
+  updateUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserUpdateUser
+     * @request PUT:/UpdateUser
+     */
+    userUpdateUser: (data: UpdateUserDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/UpdateUser`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  deleteUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserDeleteUser
+     * @request DELETE:/DeleteUser
+     */
+    userDeleteUser: (
+      query: UserDeleteUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/DeleteUser`,
+        method: "DELETE",
+        query: query,
         ...params,
       }),
   };

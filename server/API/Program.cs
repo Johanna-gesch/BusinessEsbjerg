@@ -2,6 +2,7 @@
 using API;
 using Infra;
 using Infra.Repositories;
+using Infra.Repositories.Interfaces;
 using LinqToDB;
 using Service;
 using Service.Security;
