@@ -1,13 +1,14 @@
 ﻿using Infra.Entities;
 using LinqToDB.Async;
+using LinqToDB;
 
 namespace Infra.Repositories;
 
 public class UserRepo(MyDatabaseConnection dc) : IUserRepo
 {
-    public Task Insert(User user)
+    public async Task Insert(User user)
     {
-        throw new NotImplementedException();
+        await dc.InsertAsync(user);
     }
 
     public Task<User> GetById(string id)
