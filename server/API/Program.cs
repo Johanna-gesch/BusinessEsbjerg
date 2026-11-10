@@ -5,6 +5,7 @@ using Infra.Repositories.Interfaces;
 using LinqToDB;
 using LinqToDB.AspNet;
 using Service;
+using Service.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +17,14 @@ builder.Services.AddLinqToDBContext<MyDatabaseConnection>((provider, options) =>
         )
 );
 
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.ConfigureDomainServices(
+    builder.Configuration["JwtSecret"]
+    ?? throw new InvalidOperationException("JwtSecret is missing"));
+
 
 builder.Services.AddScoped<MySeeder>();
 builder.Services.AddExceptionHandler<ProblemExceptionHandler>();
 
-builder.Services.AddOpenApiDocument(settings => settings.SchemaSettings.SchemaProcessors.Add(new RequireNotNullableSchemaProcessor()));
 builder.Services.AddControllers();
 
 builder.Services.AddProblemDetails();
@@ -40,6 +42,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().SetIsOriginAllowed(_ => true));
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseOpenApi();
 app.UseSwaggerUi();
 app.UseExceptionHandler();

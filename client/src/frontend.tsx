@@ -7,12 +7,23 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App";
+import {createBrowserRouter, Route, RouterProvider} from "react-router-dom"
+import {AdminPage} from "@/FullPages/AdminPage.tsx";
+import LoginPage from "@/FullPages/LoginPage.tsx";
+
+const router = createBrowserRouter([
+    {
+        path: "/", element:<LoginPage/>,
+    },
+    {
+        path: "/admin", element: <AdminPage />
+    },
+]);
 
 const elem = document.getElementById("root")!;
 const app = (
   <StrictMode>
-    <App />
+      <RouterProvider router={router}/>
   </StrictMode>
 );
 

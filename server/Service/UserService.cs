@@ -1,11 +1,12 @@
-using Infra;
+﻿using Infra;
 using Infra.Entities;
 using Service.DTOs.UserDTOs;
 using Infra.Repositories.Interfaces;
+using Service.Security;
 
 namespace Service;
 
-public class UserService(IUserRepo repo)
+public class UserService(IUserRepo repo, IPasswordHasher hasher)
 {
     public async Task<List<User>> GetAll() {
         return await repo.GetAll();
@@ -31,6 +32,7 @@ public class UserService(IUserRepo repo)
         await repo.Update(user);
     }
 
+    
     public async Task Insert(CreateUserDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -40,9 +42,19 @@ public class UserService(IUserRepo repo)
         {
             UserId = Guid.NewGuid().ToString(),
             Username = dto.Username,
-            PasswordHash = dto.Password,
+            PasswordHash = hasher.HashAndSaltPassword(dto.Password),
             IsAdmin = dto.IsAdmin,
         };
         await repo.Insert(newUser);
+    }
+
+    public async Task Delete(string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new Infra.ValidationException("User id cannot be null or empty");
+
+        var user = await repo.GetById(userId) ?? throw new NotFoundException($"User with id '{userId}' not found");
+
+        await repo.Delete(user);
     }
 }

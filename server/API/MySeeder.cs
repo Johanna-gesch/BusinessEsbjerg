@@ -1,6 +1,7 @@
 ﻿using Infra;
 using Infra.Entities;
 using LinqToDB;
+using LinqToDB.Data;
 
 namespace API;
 
@@ -22,7 +23,8 @@ public class MySeeder(MyDatabaseConnection dc)
                 {
                     UserId = i.ToString(),
                     Username = $"User {i}",
-                    IsAdmin = i == 1
+                    IsAdmin = i == 1,
+                    IsActive = true
                 });
             }
     }
