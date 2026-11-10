@@ -1,4 +1,5 @@
 ﻿using Infra.Entities;
+using LinqToDB.Async;
 using LinqToDB;
 
 namespace Infra.Repositories;
@@ -25,8 +26,8 @@ public class UserRepo(MyDatabaseConnection dc) : IUserRepo
         throw new NotImplementedException();
     }
 
-    public Task<List<User>> GetAll()
+    public async Task<List<User>> GetAll()
     {
-        throw new NotImplementedException();
+        return await dc.Users.ToListAsync();
     }
 }

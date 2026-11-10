@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Infra.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Service;
 using Service.DTOs.UserDTOs;
 
@@ -11,4 +12,11 @@ public class UserController(UserService service) : ControllerBase
     {
         await service.Insert(dto);
     }
+
+    [HttpGet(nameof(GetUsers))]
+    public async Task<List<User>> GetUsers()
+    {
+        return await service.GetAll();
+    }
+    
 }

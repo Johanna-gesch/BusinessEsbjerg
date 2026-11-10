@@ -10,9 +10,10 @@
  * ---------------------------------------------------------------
  */
 
-export interface CreateUserDto {
+export interface User {
+  userId: string;
   username: string;
-  password: string;
+  passwordHash: string;
   isAdmin: boolean;
 }
 
@@ -279,20 +280,19 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
-  createUser = {
+  getUsers = {
     /**
      * No description
      *
      * @tags User
-     * @name UserCreateUser
-     * @request POST:/CreateUser
+     * @name UserGetUsers
+     * @request GET:/GetUsers
      */
-    userCreateUser: (data: CreateUserDto, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/CreateUser`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
+    userGetUsers: (params: RequestParams = {}) =>
+      this.request<User[], any>({
+        path: `/GetUsers`,
+        method: "GET",
+        format: "json",
         ...params,
       }),
   };

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Infra.Entities;
 using Infra.Repositories;
 using Service.DTOs.UserDTOs;
@@ -7,6 +7,11 @@ namespace Service;
 
 public class UserService(IUserRepo repo)
 {
+    public async Task<List<User>> GetAll() {
+        return await repo.GetAll();
+    }
+    
+    
 
     public async Task Insert(CreateUserDto dto)
     {
