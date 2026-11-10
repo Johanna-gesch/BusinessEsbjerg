@@ -1,5 +1,6 @@
 using System.Text;
 using Infra.Repositories;
+using Infra.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
@@ -57,7 +58,11 @@ public static class AuthenticationExtensions
             settings.OperationProcessors.Add(
                 new AspNetCoreOperationSecurityScopeProcessor("JWT"));
         });
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", policy =>
+                policy.RequireClaim("isAdmin", "true"));
+        });
 
         return services;
 

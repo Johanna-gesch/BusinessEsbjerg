@@ -5,7 +5,7 @@ class ApiClient {
     public api;
 
     constructor() {
-        this.api = new Api<string>({
+        this.api = new Api<string |null>({
             securityWorker: (token) => {
                 if (!token) {
                     return {};

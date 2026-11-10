@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using Service.DTOs.LoginDTOs;
 using Service.DTOs.UserDTOs;
 
 namespace API.Controllers;
@@ -9,6 +10,7 @@ namespace API.Controllers;
 [ApiController]
 public class UserController(UserService service, IAuthenticationService authenticationService) : ControllerBase
 {
+    [Authorize(Policy = "admin")]
     [HttpPost(nameof(CreateUser))]
     public async Task CreateUser([FromBody] CreateUserDto dto)
     {
@@ -39,7 +41,6 @@ public class UserController(UserService service, IAuthenticationService authenti
         await service.Delete(userId);
     }
 
-    [Authorize]
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponseDTO>> Login([FromBody]
         LoginRequestDTO request)
@@ -61,17 +62,4 @@ public class UserController(UserService service, IAuthenticationService authenti
     
     
     
-}
-
-public class LoginResponseDTO
-{
-    public string Token { get; set; } = string.Empty;
-}
-
-public class LoginRequestDTO
-{
-    public string Username { get; set; } = string.Empty;
-    
-    public string Password { get; set; } = string.Empty;
-
 }

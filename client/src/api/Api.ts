@@ -29,14 +29,6 @@ export interface UpdateUserDto {
   username: string;
 }
 
-export interface UserGetUserByIdParams {
-  id?: string;
-}
-
-export interface UserDeleteUserParams {
-  userId?: string;
-}
-
 export interface LoginResponseDTO {
   token: string;
 }
@@ -44,6 +36,14 @@ export interface LoginResponseDTO {
 export interface LoginRequestDTO {
   username: string;
   password: string;
+}
+
+export interface UserGetUserByIdParams {
+  id?: string;
+}
+
+export interface UserDeleteUserParams {
+  userId?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -316,12 +316,14 @@ export class Api<
      * @tags User
      * @name UserCreateUser
      * @request POST:/CreateUser
+     * @secure
      */
     userCreateUser: (data: CreateUserDto, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/CreateUser`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -344,6 +346,68 @@ export class Api<
         ...params,
       }),
   };
+  getUserById = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserGetUserById
+     * @request GET:/GetUserById
+     * @secure
+     */
+    userGetUserById: (
+      query: UserGetUserByIdParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<User, any>({
+        path: `/GetUserById`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  updateUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserUpdateUser
+     * @request PUT:/UpdateUser
+     * @secure
+     */
+    userUpdateUser: (data: UpdateUserDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/UpdateUser`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  deleteUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserDeleteUser
+     * @request DELETE:/DeleteUser
+     * @secure
+     */
+    userDeleteUser: (
+      query: UserDeleteUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/DeleteUser`,
+        method: "DELETE",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+  };
   login = {
     /**
      * No description
@@ -361,62 +425,6 @@ export class Api<
         secure: true,
         type: ContentType.Json,
         format: "json",
-        ...params,
-      }),
-  };
-  getUserById = {
-    /**
-     * No description
-     *
-     * @tags User
-     * @name UserGetUserById
-     * @request GET:/GetUserById
-     */
-    userGetUserById: (
-      query: UserGetUserByIdParams = {},
-      params: RequestParams = {},
-    ) =>
-      this.request<User, any>({
-        path: `/GetUserById`,
-        method: "GET",
-        query: query,
-        format: "json",
-        ...params,
-      }),
-  };
-  updateUser = {
-    /**
-     * No description
-     *
-     * @tags User
-     * @name UserUpdateUser
-     * @request PUT:/UpdateUser
-     */
-    userUpdateUser: (data: UpdateUserDto, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/UpdateUser`,
-        method: "PUT",
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-  };
-  deleteUser = {
-    /**
-     * No description
-     *
-     * @tags User
-     * @name UserDeleteUser
-     * @request DELETE:/DeleteUser
-     */
-    userDeleteUser: (
-      query: UserDeleteUserParams = {},
-      params: RequestParams = {},
-    ) =>
-      this.request<void, any>({
-        path: `/DeleteUser`,
-        method: "DELETE",
-        query: query,
         ...params,
       }),
   };

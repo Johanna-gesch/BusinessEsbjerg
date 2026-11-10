@@ -1,5 +1,6 @@
 using Infra.Entities;
 using Infra.Repositories;
+using Infra.Repositories.Interfaces;
 using Service.Security;
 
 namespace Service;

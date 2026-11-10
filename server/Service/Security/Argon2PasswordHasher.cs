@@ -37,7 +37,7 @@ public class Argon2PasswordHasher : IPasswordHasher
         string[] parts = hashedPassword.Split('.');
         if (parts.Length != 2)
         {
-            throw new InvalidDataException("Can't differentiate the hashed password.");
+            return false;
         }
         
         //Wrapping these will make the method return false instead of crashing. 
