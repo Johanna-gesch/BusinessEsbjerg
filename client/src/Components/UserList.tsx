@@ -1,7 +1,7 @@
-import {Api, type User} from "@/api/Api.ts";
+import apiClient from "@/services/ApiClient.ts";
 import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
+import type {User} from "@/api/Api.ts";
 
-export const MyApi = new Api();
 
 type UsersListProps = {
     users: User[];
@@ -13,20 +13,20 @@ export function UserList({users, setUsers}: UsersListProps) {
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
     useEffect(() => {
-        MyApi.getUsers.userGetUsers().then(r => {
+        apiClient.api.getUsers.userGetUsers().then(r => {
             setUsers(r);
         });
-    }, []);
+    }, [setUsers]);
 
     function handleEditOrSaveUser(user: User) {
         if (editingUserId === user.userId) {
-            MyApi.updateUser.userUpdateUser({
+            apiClient.api.updateUser.userUpdateUser({
                 userId: user.userId,
                 username: user.username,
             })
                 .then(() => setEditingUserId(null))
                 .then(() => {
-                    MyApi.getUsers.userGetUsers().then(r => {
+                    apiClient.api.getUsers.userGetUsers().then(r => {
                         setUsers(r);
                     });
                 });

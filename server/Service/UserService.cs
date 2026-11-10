@@ -2,7 +2,6 @@ using Infra;
 using Infra.Entities;
 using Service.DTOs.UserDTOs;
 using Infra.Repositories.Interfaces;
-using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace Service;
 
@@ -31,8 +30,6 @@ public class UserService(IUserRepo repo)
         
         await repo.Update(user);
     }
-    
-    
 
     public async Task Insert(CreateUserDto dto)
     {

@@ -6,9 +6,14 @@ namespace API;
 
 public class MySeeder(MyDatabaseConnection dc)
 {
-    public void Seed()
+
+    public void InitializeDatabase()
     {
         dc.CreateTable<User>(tableOptions: TableOptions.CreateIfNotExists);
+    }
+    public void Seed()
+    {
+        InitializeDatabase();
         
         if (dc.Users.Count() == 0)
             for (int i = 1; i <= 10; i++)

@@ -10,7 +10,7 @@ export function AdminPage() {
     return (
         <div>
             <UserList users={users} setUsers={setUsers} />
-            <CreateUserForm />
+            <CreateUserForm setUsers={setUsers} />
         </div>
     )
 }
