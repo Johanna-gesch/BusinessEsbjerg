@@ -15,7 +15,6 @@ export function CreateUserForm() {
         })
             .then(() => setUsernameField(""))
             .then(() => setPasswordField(""))
-            .then(() => setIsAdmin(isAdmin))
     }
 
     return (
@@ -32,8 +31,13 @@ export function CreateUserForm() {
                 value={passwordField}
                 onChange={e => setPasswordField(e.target.value)}
             />
-
-
+            <select
+                value={isAdmin ? "admin" : "user"}
+                onChange={(e) => setIsAdmin(e.target.value === "admin")}
+            >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
             <button
                 onClick={handleCreateUser}
             >
