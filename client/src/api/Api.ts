@@ -10,6 +10,12 @@
  * ---------------------------------------------------------------
  */
 
+export interface CreateUserDto {
+  username: string;
+  password: string;
+  isAdmin: boolean;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -272,4 +278,22 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<
   SecurityDataType extends unknown,
-> extends HttpClient<SecurityDataType> {}
+> extends HttpClient<SecurityDataType> {
+  createUser = {
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserCreateUser
+     * @request POST:/CreateUser
+     */
+    userCreateUser: (data: CreateUserDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/CreateUser`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+}
