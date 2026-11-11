@@ -1,10 +1,13 @@
 import "./index.css";
 import { BrowserRouter, Routes, Route, useNavigate} from "react-router-dom";
-import {AdminPage} from "@/FullPages/AdminPage.tsx";
+import apiClient from "@/services/ApiClient.ts";
+import {useState} from "react";
+import type {User} from "@/api/Api.ts";
 
 
 export function App() {
     const navigate = useNavigate();
+
     return (
         <div>
             <h1>Business Esbjerg: Absence Resource Planning</h1>

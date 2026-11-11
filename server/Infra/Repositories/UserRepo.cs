@@ -2,7 +2,6 @@
 using Infra.Repositories.Interfaces;
 using LinqToDB;
 using LinqToDB.Async;
-using LinqToDB;
 
 namespace Infra.Repositories;
 
