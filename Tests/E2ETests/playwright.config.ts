@@ -13,7 +13,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './Tests',
+  testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -72,9 +72,21 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: [
+    {
+      command: 'dotnet run --project ../../server/API/API.csproj',
+      url: 'http://localhost:5178/swagger',
+      reuseExistingServer: false,
+      env: {
+        ASPNETCORE_ENVIRONMENT: 'Testing',
+        DB: process.env.TEST_DB!,
+        JwtSecret: process.env.JwtSecret!,
+      }
+    },
+    {
+      command: 'cd ../../client && bun run dev',
+      url: 'http://localhost:3000',
+      reuseExistingServer: false
+    }
+  ]
 });

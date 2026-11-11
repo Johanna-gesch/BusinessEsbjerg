@@ -2,6 +2,8 @@ import {type Dispatch, type SetStateAction, useState} from "react";
 import apiClient from "@/services/ApiClient.ts";
 import type {User} from "@/api/Api.ts";
 
+const MyApi = apiClient.api;
+
 type CreateUserFormProps = {
     setUsers: Dispatch<SetStateAction<User[]>>;
 };
@@ -14,13 +16,13 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
 
     async function handleCreateUser() {
         try {
-            await apiClient.api.createUser.userCreateUser({
+            await MyApi.createUser.userCreateUser({
                 username: usernameField,
                 password: passwordField,
                 isAdmin: isAdmin
             });
 
-            const updatedUsers = await apiClient.api.getUsers.userGetUsers();
+            const updatedUsers = await MyApi.getUsers.userGetUsers();
 
             setUsers(updatedUsers);
 

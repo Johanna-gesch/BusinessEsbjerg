@@ -1,5 +1,5 @@
 import apiClient from "@/services/ApiClient.ts";
-import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
+import {type Dispatch, type SetStateAction, useState} from "react";
 import type {User} from "@/api/Api.ts";
 
 const MyApi = apiClient.api;
@@ -13,26 +13,23 @@ export function UserList({users, setUsers}: UsersListProps) {
 
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
-    useEffect(() => {
-        MyApi.getUsers.userGetUsers().then(r => {
-            setUsers(r);
-        });
-    }, [setUsers]);
-
     function handleEditOrSaveUser(user: User) {
+
+        console.log("Clicked edit/save:", user.userId);
+        console.log("Currently editing:", editingUserId);
+
         if (editingUserId === user.userId) {
             MyApi.updateUser.userUpdateUser({
                 userId: user.userId,
                 username: user.username,
             })
                 .then(() => setEditingUserId(null))
-                .then(() => {
-                    MyApi.getUsers.userGetUsers().then(r => {
-                        setUsers(r);
-                    });
+                .catch(error => {
+                    console.error("Failed to update user:", error);
                 });
         } else {
             setEditingUserId(user.userId);
+            console.log("Setting editing user:", user.userId);
         }
     }
 
@@ -57,6 +54,8 @@ export function UserList({users, setUsers}: UsersListProps) {
             {users.map(user => (
                 <div
                     key={user.userId}
+                    data-testid="user-row"
+                    data-user-id={user.userId}
                 >
                     <div>
                         {editingUserId === user.userId ? (

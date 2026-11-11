@@ -2,20 +2,21 @@
 using Infra.Entities;
 using Service;
 using Service.DTOs.UserDTOs;
+using Service.Security;
 using Tests.UnitTests.Stubs;
 
 namespace Tests.UnitTests;
 
 public class UserServiceTests
 {
-
-    private readonly UserRepoStub _userRepo;
+    
     private readonly UserService _service;
+    private readonly UserRepoStub _userRepo = new();
+    private readonly HasherStub _hasher = new();
 
     public UserServiceTests()
     {
-        _userRepo = new UserRepoStub();
-        _service = new UserService(_userRepo);
+        _service = new UserService(_userRepo, _hasher);
     }
     
     // *---* CREATE TESTS *---* //
@@ -23,7 +24,7 @@ public class UserServiceTests
     #region Create Tests
     
     [Fact]
-    public async Task Insert_ValidUser_UserIsCreated()
+    public async Task Insert_ValidUser_UserIsCreatedWithHashedPassword()
     {
         // Arrange
         var dto = new CreateUserDto
@@ -43,6 +44,10 @@ public class UserServiceTests
         Assert.Equal("TestUser", users.First().Username);
         Assert.False(users.First().IsAdmin);
         Assert.False(string.IsNullOrWhiteSpace(users.First().UserId));
+        
+        // Password should be hashed before saving
+        Assert.Equal("hashed_TestPassword", users.First().PasswordHash);
+        Assert.NotEqual("TestPassword", users.First().PasswordHash);
     }
     
     [Fact]
@@ -74,6 +79,71 @@ public class UserServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<ValidationException>(() => _service.Insert(dto));
     }
+    
+    
+    
+    #endregion
+    
+    // *---* PASSWORD TESTS *---* //
+    
+    #region Password Tests
+    
+    [Fact]
+    public void HashAndSaltPassword_ValidPassword_ReturnsHashedPassword()
+    {
+        // Arrange
+        string password = "TestPassword123";
+
+        // Act
+        string hashedPassword = _hasher.HashAndSaltPassword(password);
+
+        // Assert
+        Assert.NotEqual(password, hashedPassword);
+        Assert.Contains(".", hashedPassword);
+    }
+
+    [Fact]
+    public void VerifyPassword_CorrectPassword_ReturnsTrue()
+    {
+        // Arrange
+        string password = "TestPassword123";
+        string hashedPassword = _hasher.HashAndSaltPassword(password);
+
+        // Act
+        bool result = _hasher.VerifyPassword(password, hashedPassword);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void VerifyPassword_WrongPassword_ReturnsFalse()
+    {
+        // Arrange
+        string password = "TestPassword123";
+        string hashedPassword = _hasher.HashAndSaltPassword(password);
+
+        // Act
+        bool result = _hasher.VerifyPassword("WrongPassword", hashedPassword);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void HashAndSaltPassword_SamePassword_GeneratesDifferentHashes()
+    {
+        // Arrange
+        string password = "TestPassword123";
+
+        // Act
+        string hash1 = _hasher.HashAndSaltPassword(password);
+        string hash2 = _hasher.HashAndSaltPassword(password);
+
+        // Assert
+        Assert.NotEqual(hash1, hash2);
+    }
+    
     #endregion
     
     // *---* READ TESTS *---* //

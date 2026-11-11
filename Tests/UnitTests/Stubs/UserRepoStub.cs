@@ -46,4 +46,11 @@ public class UserRepoStub : IUserRepo
         return await Task.FromResult(_users);
         
     }
+
+    public async Task<User?> GetByUsername(string username)
+    {
+        return await Task.FromResult(
+            _users.FirstOrDefault(u => u.Username == username)
+        );
+    }
 }

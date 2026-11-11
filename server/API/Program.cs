@@ -1,11 +1,7 @@
 using API;
 using Infra;
-using Infra.Repositories;
-using Infra.Repositories.Interfaces;
 using LinqToDB;
 using LinqToDB.AspNet;
-using Service;
-using Service.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +50,7 @@ if (app.Environment.IsEnvironment("Testing"))
     using var scope = app.Services.CreateScope();
 
     var seeder = scope.ServiceProvider.GetRequiredService<MySeeder>();
-    seeder.InitializeDatabase();
+    seeder.SeedForTests();
 }
 else
 {

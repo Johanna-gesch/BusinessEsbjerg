@@ -10,7 +10,7 @@ namespace API.Controllers;
 [ApiController]
 public class UserController(UserService service, IAuthenticationService authenticationService) : ControllerBase
 {
-    [Authorize(Policy = "admin")]
+    [Authorize(Policy = "Admin")]
     [HttpPost(nameof(CreateUser))]
     public async Task CreateUser([FromBody] CreateUserDto dto)
     {

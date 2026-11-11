@@ -41,6 +41,8 @@ public static class AuthenticationExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtSecret))
                 };
+                
+                
             });
 
         services.AddOpenApiDocument(settings =>
