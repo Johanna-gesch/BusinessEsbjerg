@@ -2,14 +2,20 @@
 using Infra.Entities;
 using LinqToDB;
 using LinqToDB.Data;
+using Service.Security;
 
 namespace API;
 
-public class MySeeder(MyDatabaseConnection dc)
+public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
 {
-    public void Seed()
+
+    private void InitializeDatabase()
     {
         dc.CreateTable<User>(tableOptions: TableOptions.CreateIfNotExists);
+    }
+    public void Seed()
+    {
+        InitializeDatabase();
         
         if (dc.Users.Count() == 0)
             for (int i = 1; i <= 10; i++)
@@ -22,6 +28,27 @@ public class MySeeder(MyDatabaseConnection dc)
                     IsActive = true
                 });
             }
+    }
+
+    public void SeedForTests()
+    {
+        InitializeDatabase();
+
+        const string username = "playwright_admin";
+        const string password = "PlaywrightPassword123";
+
+        // Idempotence: Only create the user if it doesn't already exist.
+        if (!dc.Users.Any(u => u.Username == username))
+        {
+            dc.Insert(new User
+            {
+                UserId = Guid.NewGuid().ToString(),
+                Username = username,
+                PasswordHash = hasher.HashAndSaltPassword(password),
+                IsAdmin = true,
+                IsActive = true
+            });
+        }
     }
     
 }

@@ -20,6 +20,18 @@ public class UserService(IUserRepo repo, IPasswordHasher hasher)
         return await repo.GetById(id)
             ?? throw new NotFoundException($"User with this id '{id}' not found");
     }
+
+    public async Task Update(UpdateUserDto dto)
+    {
+        var user = await repo.GetById(dto.UserId)
+            ?? throw new ValidationException("User not found");
+
+        if (!string.IsNullOrWhiteSpace(dto.Username))
+            user.Username = dto.Username;
+        
+        await repo.Update(user);
+    }
+
     
     public async Task Insert(CreateUserDto dto)
     {
@@ -34,17 +46,6 @@ public class UserService(IUserRepo repo, IPasswordHasher hasher)
             IsAdmin = dto.IsAdmin,
         };
         await repo.Insert(newUser);
-    }
-    
-    public async Task Update(UpdateUserDto dto)
-    {
-        var user = await repo.GetById(dto.UserId)
-                   ?? throw new ValidationException("User not found");
-
-        if (!string.IsNullOrWhiteSpace(dto.Username))
-            user.Username = dto.Username;
-        
-        await repo.Update(user);
     }
 
     public async Task Delete(string userId)
