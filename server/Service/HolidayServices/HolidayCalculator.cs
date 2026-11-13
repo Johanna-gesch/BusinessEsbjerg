@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using ValidationException = Infra.ValidationException;
+using Infra;
 
 namespace Service.HolidayServices;
 
