@@ -8,6 +8,7 @@ namespace API.Controllers;
 [ApiController]
 public class AccountController(AccountService service) : ControllerBase
 {
+   /*
     [HttpPost(nameof(CreateAccount))]
     public async Task<ActionResult<HolidayAccount>> CreateAccount(
         [FromBody] CreateHolidayAccountDto dto)
@@ -18,7 +19,7 @@ public class AccountController(AccountService service) : ControllerBase
             nameof(GetAccountById),
             new { id = account.Id },
             account);
-    }
+    }*/
 
     [HttpGet(nameof(GetAccountById))]
     public async Task<ActionResult<HolidayAccount>> GetAccountById(Guid id)
