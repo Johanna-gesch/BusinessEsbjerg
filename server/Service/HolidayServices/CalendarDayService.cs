@@ -30,5 +30,14 @@ public class CalendarDayService (ICalendarDayRepo repo)
             Name = entity.Name
         };
     }
+
+    public async Task<HashSet<DateOnly>> GetHolidayDates(DateOnly start, DateOnly end)
+    {
+        if (end < start)
+            throw new ValidationException("End date must be on or after start date");
+
+        var days = await repo.GetBetween(start, end);
+        return days.Select(d => d.Date).ToHashSet();
+    }
     
 }

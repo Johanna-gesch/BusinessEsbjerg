@@ -39,6 +39,19 @@ public class CalendarDayServiceTests
         Assert.NotEqual(Guid.Empty, result.Id);
         Assert.Single(_repoStub.Days);
     }
+
+    [Fact]
+    public async Task GetHolidayDates_ReturnsOnlyDatesInsideThePEriod()
+    {
+        await _service.Create(new CreateCalendarDayDTO { Date = new DateOnly(2026, 10, 15), Name = "A" });
+        await _service.Create(new CreateCalendarDayDTO { Date = new DateOnly(2026, 10, 15), Name = "New Year" });
+        
+        var result = await _service.GetHolidayDates(new DateOnly(2026, 10, 12), new DateOnly(2026, 10, 16));
+        
+        Assert.Single(result);
+        Assert.Contains(new DateOnly(2026, 10, 15), result);
+
+    }
     
 
 }
