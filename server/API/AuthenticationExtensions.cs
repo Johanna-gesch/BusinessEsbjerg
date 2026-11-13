@@ -25,6 +25,9 @@ public static class AuthenticationExtensions
         services.AddScoped<UserService>();
         services.AddScoped<IUserRepo, UserRepo>();
 
+        services.AddScoped<ICalendarDayRepo, CalendarDayRepo>();
+        services.AddScoped<CalendarDayService>();
+        
         services.AddScoped<AccountService>();
         services.AddScoped<IAccountRepo, AccountRepo>();
 

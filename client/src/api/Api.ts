@@ -73,9 +73,18 @@ export interface HolidayTransaction {
   description?: string | null;
 }
 
-export interface CreateHolidayAccountDto {
-  userId: string;
-  type: HolidayType;
+export interface CalendarDayDTO {
+  /** @format guid */
+  id: string;
+  /** @format date */
+  date: string;
+  name: string;
+}
+
+export interface CreateCalendarDayDTO {
+  /** @format date */
+  date: string;
+  name: string;
 }
 
 export interface SalaryHistory {
@@ -431,29 +440,6 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
-  createAccount = {
-    /**
-     * No description
-     *
-     * @tags Account
-     * @name AccountCreateAccount
-     * @request POST:/CreateAccount
-     * @secure
-     */
-    accountCreateAccount: (
-      data: CreateHolidayAccountDto,
-      params: RequestParams = {},
-    ) =>
-      this.request<HolidayAccount, any>({
-        path: `/CreateAccount`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
   getAccountById = {
     /**
      * No description
@@ -516,6 +502,29 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createCalendarDay = {
+    /**
+     * No description
+     *
+     * @tags CalendarDay
+     * @name CalendarDayCreateCalendarDay
+     * @request POST:/CreateCalendarDay
+     * @secure
+     */
+    calendarDayCreateCalendarDay: (
+      data: CreateCalendarDayDTO,
+      params: RequestParams = {},
+    ) =>
+      this.request<CalendarDayDTO, any>({
+        path: `/CreateCalendarDay`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

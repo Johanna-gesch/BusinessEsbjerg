@@ -19,6 +19,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 
                 ["JwtSecret"] = Environment.GetEnvironmentVariable("JwtSecret")
                                 ?? throw new InvalidOperationException("JwtSecret is not set.")
+                
             });
             Console.WriteLine("CUSTOM TEST CONFIGURATION LOADED");
         });

@@ -11,7 +11,8 @@ namespace Service;
 public class UserService(
     IUserRepo repo ,
     IPasswordHasher hasher,
-    SalaryHistoryService salService)
+    SalaryHistoryService salService,
+    AccountService accountService)
 {
     public async Task<List<User>> GetAll() {
         return await repo.GetAll();
@@ -73,6 +74,8 @@ public class UserService(
             IsAdmin = dto.IsAdmin,
         };
         await repo.Insert(newUser);
+
+        await accountService.CreateDefaultAccountsAsync(newUser.UserId);
     }
 
     public async Task Delete(string userId)
