@@ -10,6 +10,69 @@
  * ---------------------------------------------------------------
  */
 
+export enum HolidayRequestStatus {
+  Pending = 0,
+  Approved = 1,
+  Rejected = 2,
+  Cancelled = 3,
+}
+
+export enum HolidayTransactionType {
+  Earned = 0,
+  Used = 1,
+  TransferredIn = 2,
+  TransferredOut = 3,
+  PaidOut = 4,
+  Adjustment = 5,
+}
+
+export enum HolidayType {
+  Week15 = 0,
+  Week6 = 1,
+}
+
+export interface HolidayAccount {
+  /** @format guid */
+  id: string;
+  userId: string;
+  type: HolidayType;
+  earnings: HolidayEarning[];
+  transactions: HolidayTransaction[];
+}
+
+export interface HolidayEarning {
+  /** @format guid */
+  id: string;
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format date */
+  earnedDate: string;
+  /** @format decimal */
+  earnedHours: number;
+  /** @format date */
+  expiryDate: string;
+}
+
+export interface HolidayTransaction {
+  /** @format guid */
+  id: string;
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format guid */
+  holidayEarningId?: string | null;
+  /** @format decimal */
+  amountHours: number;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+}
+
+export interface CreateHolidayAccountDto {
+  userId: string;
+  type: HolidayType;
+}
+
 export interface CreateUserDto {
   username: string;
   password: string;
@@ -22,6 +85,30 @@ export interface User {
   passwordHash: string;
   isAdmin: boolean;
   isActive: boolean;
+  holidayAccounts: HolidayAccount[];
+  holidayRequests: HolidayRequest[];
+}
+
+export interface HolidayRequest {
+  /** @format guid */
+  id: string;
+  userId: string;
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format date-time */
+  createdAt: string;
+  cancellationReason?: string | null;
+  /** @format date */
+  startDate: string;
+  /** @format date */
+  endDate: string;
+  status: HolidayRequestStatus;
+  approvedByUserId?: string | null;
+  /** @format date-time */
+  approvedAt?: string | null;
+  rejectionReason?: string | null;
+  user: User;
+  holidayAccount: HolidayAccount;
 }
 
 export interface UpdateUserDto {
@@ -36,6 +123,15 @@ export interface LoginResponseDTO {
 export interface LoginRequestDTO {
   username: string;
   password: string;
+}
+
+export interface AccountGetAccountByIdParams {
+  /** @format guid */
+  id?: string;
+}
+
+export interface AccountGetAccountsForUserParams {
+  userId?: string;
 }
 
 export interface UserGetUserByIdParams {
@@ -309,6 +405,73 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
+  createAccount = {
+    /**
+     * No description
+     *
+     * @tags Account
+     * @name AccountCreateAccount
+     * @request POST:/CreateAccount
+     * @secure
+     */
+    accountCreateAccount: (
+      data: CreateHolidayAccountDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayAccount, any>({
+        path: `/CreateAccount`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  getAccountById = {
+    /**
+     * No description
+     *
+     * @tags Account
+     * @name AccountGetAccountById
+     * @request GET:/GetAccountById
+     * @secure
+     */
+    accountGetAccountById: (
+      query: AccountGetAccountByIdParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayAccount, any>({
+        path: `/GetAccountById`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getAccountsForUser = {
+    /**
+     * No description
+     *
+     * @tags Account
+     * @name AccountGetAccountsForUser
+     * @request GET:/GetAccountsForUser
+     * @secure
+     */
+    accountGetAccountsForUser: (
+      query: AccountGetAccountsForUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayAccount[], any>({
+        path: `/GetAccountsForUser`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
   createUser = {
     /**
      * No description
