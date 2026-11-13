@@ -14,13 +14,17 @@ public class UserServiceTests
     private readonly UserService _service;
     private readonly AccountService _accountService;
     private readonly UserRepoStub _userRepo = new();
+    private readonly SalaryHistoryStub _salHisStub = new();
     private readonly AccountRepoStub _accountRepoStub = new();
     private readonly HasherStub _hasher = new();
+    
+    private readonly SalaryHistoryService _salService;
 
     public UserServiceTests()
     {
         _accountService = new AccountService(_accountRepoStub);
-        _service = new UserService(_userRepo, _hasher, _accountService);
+        _salService = new SalaryHistoryService(_salHisStub);
+        _service = new UserService(_userRepo, _hasher, _salService, _accountService);
     }
     
     // *---* CREATE TESTS *---* //
