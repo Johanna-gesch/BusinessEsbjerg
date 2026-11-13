@@ -1,11 +1,13 @@
 using System.Text;
 using Infra.Repositories;
+using Infra.Repositories.HolidayRepos;
 using Infra.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Service;
+using Service.HolidayServices;
 using Service.Security;
 
 
@@ -21,6 +23,10 @@ public static class AuthenticationExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<UserService>();
         services.AddScoped<IUserRepo, UserRepo>();
+
+        services.AddScoped<AccountService>();
+        services.AddScoped<IAccountRepo, AccountRepo>();
+        
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
