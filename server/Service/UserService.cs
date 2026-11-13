@@ -2,11 +2,12 @@
 using Infra.Entities;
 using Service.DTOs.UserDTOs;
 using Infra.Repositories.Interfaces;
+using Service.HolidayServices;
 using Service.Security;
 
 namespace Service;
 
-public class UserService(IUserRepo repo, IPasswordHasher hasher)
+public class UserService(IUserRepo repo, IPasswordHasher hasher, AccountService accountService)
 {
     public async Task<List<User>> GetAll() {
         return await repo.GetAll();
@@ -46,6 +47,8 @@ public class UserService(IUserRepo repo, IPasswordHasher hasher)
             IsAdmin = dto.IsAdmin,
         };
         await repo.Insert(newUser);
+
+        await accountService.CreateDefaultAccountsAsync(newUser.UserId);
     }
 
     public async Task Delete(string userId)

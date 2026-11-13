@@ -23,55 +23,42 @@ public class AccountServiceTests
     #region Create Tests
 
     [Fact]
-    public async Task CreateAccount_ValidAccount_AccountIsCreated()
+    public async Task CreateDefaultAccounts_ValidUserId_CreatesTwoAccounts()
     {
         // Arrange
-        var dto = new CreateHolidayAccountDto
-        {
-            UserId = "123",
-            Type = HolidayType.Week1_5
-        };
+        var userId = "123";
 
         // Act
-        var result = await _service.CreateAccountAsync(dto);
+        await _service.CreateDefaultAccountsAsync(userId);
 
         // Assert
-        var accounts = await _accountRepo.GetUserAccountsAsync("123");
+        var accounts = await _accountRepo.GetUserAccountsAsync(userId);
 
-        Assert.Single(accounts);
-        Assert.Equal("123", result.UserId);
-        Assert.Equal(dto.Type, result.Type);
-        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.Equal(2, accounts.Count);
+        Assert.Contains(accounts, a => a.Type == HolidayType.Week1_5);
+        Assert.Contains(accounts, a => a.Type == HolidayType.Week6);
+
+        Assert.All(accounts, account =>
+            Assert.Equal(userId, account.UserId));
+
+        Assert.All(accounts, account =>
+            Assert.NotEqual(Guid.Empty, account.Id));
     }
 
     [Fact]
-    public async Task CreateAccount_EmptyUserId_ThrowsValidationException()
+    public async Task CreateDefaultAccounts_EmptyUserId_ThrowsValidationException()
     {
-        // Arrange
-        var dto = new CreateHolidayAccountDto
-        {
-            UserId = "",
-            Type = HolidayType.Week1_5
-        };
-
         // Act & Assert
         await Assert.ThrowsAsync<ValidationException>(
-            () => _service.CreateAccountAsync(dto));
+            () => _service.CreateDefaultAccountsAsync(""));
     }
 
     [Fact]
-    public async Task CreateAccount_InvalidType_ThrowsValidationException()
+    public async Task CreateDefaultAccounts_NullUserId_ThrowsValidationException()
     {
-        // Arrange
-        var dto = new CreateHolidayAccountDto
-        {
-            UserId = "123",
-            Type = (HolidayType)999
-        };
-
         // Act & Assert
         await Assert.ThrowsAsync<ValidationException>(
-            () => _service.CreateAccountAsync(dto));
+            () => _service.CreateDefaultAccountsAsync(null!));
     }
 
     #endregion
