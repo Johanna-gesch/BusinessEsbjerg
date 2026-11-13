@@ -13,12 +13,6 @@ builder.Services.AddLinqToDBContext<MyDatabaseConnection>((provider, options) =>
         )
 );
 
-if (builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Configuration.AddUserSecrets(
-        typeof(Program).Assembly,
-        optional: false);
-}
 builder.Services.ConfigureDomainServices(
     builder.Configuration["JwtSecret"]
     ?? throw new InvalidOperationException("JwtSecret is missing"));
@@ -43,12 +37,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().SetIsOriginAllowed(_ => true));
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOpenApi();
 app.UseSwaggerUi();
-app.UseExceptionHandler();
+
 
 
 if (app.Environment.IsEnvironment("Testing"))

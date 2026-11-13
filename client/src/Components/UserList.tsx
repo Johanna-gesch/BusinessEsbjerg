@@ -1,6 +1,8 @@
+
 import apiClient from "@/services/ApiClient.ts";
-import {type Dispatch, type SetStateAction, useState} from "react";
-import type {User} from "@/api/Api.ts";
+import { type Dispatch, type SetStateAction, useState } from "react";
+import type { User } from "@/api/Api.ts";
+import { EditUser } from "./EditUser";
 
 const MyApi = apiClient.api;
 
@@ -9,29 +11,9 @@ type UsersListProps = {
     setUsers: Dispatch<SetStateAction<User[]>>;
 };
 
-export function UserList({users, setUsers}: UsersListProps) {
+export function UserList({ users, setUsers }: UsersListProps) {
 
-    const [editingUserId, setEditingUserId] = useState<string | null>(null);
-
-    function handleEditOrSaveUser(user: User) {
-
-        console.log("Clicked edit/save:", user.userId);
-        console.log("Currently editing:", editingUserId);
-
-        if (editingUserId === user.userId) {
-            MyApi.updateUser.userUpdateUser({
-                userId: user.userId,
-                username: user.username,
-            })
-                .then(() => setEditingUserId(null))
-                .catch(error => {
-                    console.error("Failed to update user:", error);
-                });
-        } else {
-            setEditingUserId(user.userId);
-            console.log("Setting editing user:", user.userId);
-        }
-    }
+    const [editingUser, setEditingUser] = useState<User | null>(null);
 
     function handleDeleteUser(userId: string) {
         if (!window.confirm("Are you sure you want to delete this user?")) {
@@ -42,11 +24,23 @@ export function UserList({users, setUsers}: UsersListProps) {
             userId: userId
         })
             .then(() => {
-                setUsers(users.filter(user => user.userId !== userId));
+                setUsers(prevUsers =>
+                    prevUsers.filter(user => user.userId !== userId)
+                );
             })
             .catch(error => {
                 console.error("Failed to delete user:", error);
             });
+    }
+
+    function handleUpdateUser(updatedUser: User) {
+        setUsers(prevUsers =>
+            prevUsers.map(user =>
+                user.userId === updatedUser.userId
+                    ? updatedUser
+                    : user
+            )
+        );
     }
 
     return (
@@ -58,22 +52,10 @@ export function UserList({users, setUsers}: UsersListProps) {
                     data-user-id={user.userId}
                 >
                     <div>
-                        {editingUserId === user.userId ? (
-                            <input
-                                value={user.username}
-                                onChange={e => {
-                                    setUsers(users.map(u =>
-                                    u.userId === user.userId
-                                        ? {...u, username: e.target.value}
-                                        : u
-                                    ));
-                                }}
-                            />
-                        ) : (
-                            <>{user.username}</>
-                        )}
-                        <button onClick={() => handleEditOrSaveUser(user)}>
-                            {editingUserId === user.userId ? "Save" : "Edit"}
+                        <span>{user.username}</span>
+
+                        <button onClick={() => setEditingUser(user)}>
+                            Edit
                         </button>
 
                         <button onClick={() => handleDeleteUser(user.userId)}>
@@ -82,7 +64,14 @@ export function UserList({users, setUsers}: UsersListProps) {
                     </div>
                 </div>
             ))}
-        </div>
-    )
 
+            {editingUser && (
+                <EditUser
+                    user={editingUser}
+                    onClose={() => setEditingUser(null)}
+                    onUpdated={handleUpdateUser}
+                />
+            )}
+        </div>
+    );
 }
