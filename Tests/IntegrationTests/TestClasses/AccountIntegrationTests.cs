@@ -27,77 +27,6 @@ public class AccountIntegrationTests
         _helpers = new HelperMethods(_factory, _client);
     }
 
-    // --- CREATE TESTS ---
-
-    #region Create Tests
-
-    [Fact]
-    public async Task CreateAccount_WithValidData_CreatesAccount()
-
-    private async Task<string> GetAdminUserId()
-    {
-        using var scope = _factory.Services.CreateScope();
-
-        var repo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
-        var admin = await repo.GetByUsername("integration_admin");
-
-        return admin!.UserId;
-    }
-
-    private async Task<(string UserId, List<HolidayAccount> accounts)> CreateUserWithAccounts()
-    {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
-
-        var userId = await _helpers.GetAdminUserId();
-
-        var dto = new CreateHolidayAccountDto
-        {
-            UserId = userId,
-            Type = HolidayType.Week1_5
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            dto);
-        using var scope = _factory.Services.CreateScope();
-
-        var userService = scope.ServiceProvider.GetRequiredService<UserService>();
-
-        var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
-
-        var accountRepo = scope.ServiceProvider.GetRequiredService<IAccountRepo>();
-
-        var username = $"account_test_{Guid.NewGuid():N}";
-    [Fact]
-    public async Task CreateAccount_WithoutUserId_ReturnsBadRequest()
-    {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
-
-        await userService.Insert(new CreateUserDto
-        {
-            Username = username,
-            Password = "TestPassword123",
-            IsAdmin = false
-        });
-
-        var user = await userRepo.GetByUsername(username);
-    [Fact]
-    public async Task CreateAccount_WithInvalidType_ReturnsBadRequest()
-    {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
-
-        var accounts = await accountRepo.GetUserAccountsAsync(user!.UserId);
-        var userId = await _helpers.GetAdminUserId();
-
-        return (user.UserId, accounts.ToList());
-    }
-
-    #endregion
-
     // --- READ TESTS ---
 
     #region Read Tests
@@ -108,8 +37,7 @@ public class AccountIntegrationTests
         // Arrange
         await _helpers.AuthorizeAsAdmin();
 
-        var userId = await _helpers.GetAdminUserId();
-        var (userId, accounts) = await CreateUserWithAccounts();
+        var (userId, accounts) = await _helpers.CreateUserWithAccounts();
 
         var createdAccount = accounts.Single(
             a => a.Type == HolidayType.Week1_5);
@@ -148,16 +76,7 @@ public class AccountIntegrationTests
         // Arrange
         await _helpers.AuthorizeAsAdmin();
 
-        var userId = await _helpers.GetAdminUserId();
-
-        await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            new CreateHolidayAccountDto
-            {
-                UserId = userId,
-                Type = HolidayType.Week1_5
-            });
-        var (userId, _) = await CreateUserWithAccounts();
+        var (userId, _) = await _helpers.CreateUserWithAccounts();
 
         // Act
         var response = await _client.GetAsync(
