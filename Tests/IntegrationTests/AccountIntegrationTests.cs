@@ -6,8 +6,9 @@ using Infra.Entities;
 using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Service;
 using Service.DTOs.LoginDTOs;
-using Service.DTOs.HolidayDTOs;
+using Service.DTOs.UserDTOs;
 using Service.Security;
 
 namespace Tests.IntegrationTests;
@@ -87,84 +88,30 @@ public class AccountIntegrationTests
         return admin!.UserId;
     }
 
-    #endregion
-
-    // --- CREATE TESTS ---
-
-    #region Create Tests
-
-    [Fact]
-    public async Task CreateAccount_WithValidData_CreatesAccount()
+    private async Task<(string UserId, List<HolidayAccount> accounts)> CreateUserWithAccounts()
     {
-        // Arrange
-        await AuthorizeAsAdmin();
+        using var scope = _factory.Services.CreateScope();
 
-        var userId = await GetAdminUserId();
+        var userService = scope.ServiceProvider.GetRequiredService<UserService>();
 
-        var dto = new CreateHolidayAccountDto
+        var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
+
+        var accountRepo = scope.ServiceProvider.GetRequiredService<IAccountRepo>();
+
+        var username = $"account_test_{Guid.NewGuid():N}";
+
+        await userService.Insert(new CreateUserDto
         {
-            UserId = userId,
-            Type = HolidayType.Week1_5
-        };
+            Username = username,
+            Password = "TestPassword123",
+            IsAdmin = false
+        });
 
-        // Act
-        var response = await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            dto);
+        var user = await userRepo.GetByUsername(username);
 
-        // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var accounts = await accountRepo.GetUserAccountsAsync(user!.UserId);
 
-        var account = await response.Content.ReadFromJsonAsync<HolidayAccount>();
-
-        Assert.NotNull(account);
-        Assert.NotEqual(Guid.Empty, account.Id);
-        Assert.Equal(userId, account.UserId);
-        Assert.Equal(dto.Type, account.Type);
-    }
-
-    [Fact]
-    public async Task CreateAccount_WithoutUserId_ReturnsBadRequest()
-    {
-        // Arrange
-        await AuthorizeAsAdmin();
-
-        var dto = new CreateHolidayAccountDto
-        {
-            UserId = "",
-            Type = HolidayType.Week1_5
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            dto);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task CreateAccount_WithInvalidType_ReturnsBadRequest()
-    {
-        // Arrange
-        await AuthorizeAsAdmin();
-
-        var userId = await GetAdminUserId();
-
-        var dto = new CreateHolidayAccountDto
-        {
-            UserId = userId,
-            Type = (HolidayType)999
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            dto);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        return (user.UserId, accounts.ToList());
     }
 
     #endregion
@@ -179,20 +126,10 @@ public class AccountIntegrationTests
         // Arrange
         await AuthorizeAsAdmin();
 
-        var userId = await GetAdminUserId();
+        var (userId, accounts) = await CreateUserWithAccounts();
 
-        var createResponse = await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            new CreateHolidayAccountDto
-            {
-                UserId = userId,
-                Type = HolidayType.Week1_5
-            });
-        
-        var createdAccount =
-            await createResponse.Content.ReadFromJsonAsync<HolidayAccount>();
-
-        Assert.NotNull(createdAccount);
+        var createdAccount = accounts.Single(
+            a => a.Type == HolidayType.Week1_5);
 
         // Act
         var response = await _client.GetAsync(
@@ -228,15 +165,7 @@ public class AccountIntegrationTests
         // Arrange
         await AuthorizeAsAdmin();
 
-        var userId = await GetAdminUserId();
-
-        await _client.PostAsJsonAsync(
-            "/CreateAccount",
-            new CreateHolidayAccountDto
-            {
-                UserId = userId,
-                Type = HolidayType.Week1_5
-            });
+        var (userId, _) = await CreateUserWithAccounts();
 
         // Act
         var response = await _client.GetAsync(
@@ -249,7 +178,11 @@ public class AccountIntegrationTests
             await response.Content.ReadFromJsonAsync<List<HolidayAccount>>();
 
         Assert.NotNull(accounts);
-        Assert.NotEmpty(accounts);
+        Assert.Equal(2, accounts.Count);
+
+        Assert.Contains(accounts, a => a.Type == HolidayType.Week1_5);
+        Assert.Contains(accounts, a => a.Type == HolidayType.Week6);
+
         Assert.All(accounts, account =>
             Assert.Equal(userId, account.UserId));
     }

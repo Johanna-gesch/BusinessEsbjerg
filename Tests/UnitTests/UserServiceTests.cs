@@ -2,6 +2,7 @@
 using Infra.Entities;
 using Service;
 using Service.DTOs.UserDTOs;
+using Service.HolidayServices;
 using Service.Security;
 using Tests.UnitTests.Stubs;
 
@@ -11,12 +12,15 @@ public class UserServiceTests
 {
     
     private readonly UserService _service;
+    private readonly AccountService _accountService;
     private readonly UserRepoStub _userRepo = new();
+    private readonly AccountRepoStub _accountRepoStub = new();
     private readonly HasherStub _hasher = new();
 
     public UserServiceTests()
     {
-        _service = new UserService(_userRepo, _hasher);
+        _accountService = new AccountService(_accountRepoStub);
+        _service = new UserService(_userRepo, _hasher, _accountService);
     }
     
     // *---* CREATE TESTS *---* //
@@ -80,6 +84,34 @@ public class UserServiceTests
         await Assert.ThrowsAsync<ValidationException>(() => _service.Insert(dto));
     }
     
+    [Fact]
+    public async Task Insert_ValidUser_CreatesTwoHolidayAccounts()
+    {
+        // Arrange
+        var dto = new CreateUserDto
+        {
+            Username = "TestUser",
+            Password = "TestPassword",
+            IsAdmin = false
+        };
+
+        // Act
+        await _service.Insert(dto);
+
+        // Assert
+        var user = Assert.Single(await _userRepo.GetAll());
+
+        Assert.Equal(2, _accountRepoStub.Accounts.Count);
+
+        Assert.All(_accountRepoStub.Accounts, account =>
+            Assert.Equal(user.UserId, account.UserId));
+
+        Assert.Contains(_accountRepoStub.Accounts,
+            account => account.Type == HolidayType.Week1_5);
+
+        Assert.Contains(_accountRepoStub.Accounts,
+            account => account.Type == HolidayType.Week6);
+    }
     
     
     #endregion

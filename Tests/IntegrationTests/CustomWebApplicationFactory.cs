@@ -12,16 +12,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureAppConfiguration((context, config) =>
         {
-           config.AddUserSecrets(typeof(Program).Assembly, optional: false);
-            
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["DB"] = Environment.GetEnvironmentVariable("TEST_DB")
                          ?? throw new InvalidOperationException("TEST_DB is not set."),
-                /*
+                
                 ["JwtSecret"] = Environment.GetEnvironmentVariable("JwtSecret")
                                 ?? throw new InvalidOperationException("JwtSecret is not set.")
-                */
+                
             });
             Console.WriteLine("CUSTOM TEST CONFIGURATION LOADED");
         });

@@ -10,29 +10,35 @@ namespace Service.HolidayServices;
 
 public class AccountService(IAccountRepo accountRepo)
 {
-    public async Task<HolidayAccount> CreateAccountAsync(CreateHolidayAccountDto dto)
+    public async Task CreateDefaultAccountsAsync(string userId)
     {
-        if (string.IsNullOrWhiteSpace(dto.UserId))
-            throw new ValidationException("User Id cannot be null.");
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ValidationException("User Id cannot be empty.");
 
-        if (!Enum.IsDefined(typeof(HolidayType), dto.Type))
-            throw new ValidationException("Invalid account type.");
-        
-        var account = new HolidayAccount
+        var accounts = new[]
         {
-            Id = Guid.NewGuid(),
-            UserId = dto.UserId,
-            Type = dto.Type
+            new HolidayAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Type = HolidayType.Week1_5
+            },
+            new HolidayAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Type = HolidayType.Week6
+            }
         };
 
-        await accountRepo.InsertAsync(account);
-
-        return account;
+        foreach (var account in accounts)
+        {
+            await accountRepo.InsertAsync(account);
+        }
     }
 
     public async Task<HolidayAccount> GetAccountById(Guid id)
     {
-        
         if (id == Guid.Empty)
             throw new ValidationException("Account Id cannot be empty.");
 

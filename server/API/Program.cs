@@ -13,12 +13,6 @@ builder.Services.AddLinqToDBContext<MyDatabaseConnection>((provider, options) =>
         )
 );
 
-if (builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Configuration.AddUserSecrets(
-        typeof(Program).Assembly,
-        optional: false);
-}
 builder.Services.ConfigureDomainServices(
     builder.Configuration["JwtSecret"]
     ?? throw new InvalidOperationException("JwtSecret is missing"));
