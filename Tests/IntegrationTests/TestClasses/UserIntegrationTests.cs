@@ -8,14 +8,12 @@ namespace Tests.IntegrationTests.TestClasses;
 public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
-    private readonly CustomWebApplicationFactory _factory;
     private readonly HelperMethods _helpers;
 
     public UserIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _factory = factory;
         _client = factory.CreateClient();
-        _helpers = new HelperMethods(_factory,  _client);
+        _helpers = new HelperMethods(factory,  _client);
     }
 
     // *---* CREATE TESTS *---* //
@@ -93,7 +91,6 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Contains(users, user => user.Username == username);
     }
     #endregion
-
 
     // *---* READ TESTS *---* //
     

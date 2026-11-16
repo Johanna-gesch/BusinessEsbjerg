@@ -4,8 +4,6 @@ using Infra.Entities;
 using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Entities.HolidayTracking.Requests;
-using Infra.Entities.HolidayTracking.Rules;
-using Infra.Entities.HolidayTracking.Salary;
 using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Entities.HolidayTracking.WorkSchedule;
 using Infra.Entities.Users;
@@ -26,8 +24,4 @@ public class MyDatabaseConnection(DataOptions<MyDatabaseConnection> options) : D
 
     public ITable<WorkSchedule> WorkSchedules => this.GetTable<WorkSchedule>();
     public ITable<WorkScheduleHistory> WorkScheduleHistories => this.GetTable<WorkScheduleHistory>();
-
-    public ITable<SalaryHistory> SalaryHistories => this.GetTable<SalaryHistory>();
-
-    public ITable<RuleParameter> RuleParameters => this.GetTable<RuleParameter>();
 }

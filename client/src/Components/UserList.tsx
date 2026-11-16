@@ -2,7 +2,7 @@
 import apiClient from "@/services/ApiClient.ts";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import type { User } from "@/api/Api.ts";
-import { EditUser } from "./EditUser";
+import { EditUserForm } from "./EditUserForm.tsx";
 
 const MyApi = apiClient.api;
 
@@ -66,7 +66,7 @@ export function UserList({ users, setUsers }: UsersListProps) {
             ))}
 
             {editingUser && (
-                <EditUser
+                <EditUserForm
                     user={editingUser}
                     onClose={() => setEditingUser(null)}
                     onUpdated={handleUpdateUser}
