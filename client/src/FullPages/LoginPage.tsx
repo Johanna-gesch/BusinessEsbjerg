@@ -32,10 +32,10 @@ export default function LoginPage() {
                 return;
             }
 
-            // save user so the App.tsx can get it
+            // save user so the Dashboard.tsx can get it
             localStorage.setItem("loggedInUser", JSON.stringify(user));
 
-            navigate("/admin");
+            navigate("/dashboard");
         } catch (err) {
             setError("Login failed")
         }

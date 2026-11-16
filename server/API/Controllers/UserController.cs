@@ -29,6 +29,7 @@ public class UserController(UserService service, IAuthenticationService authenti
         return await service.GetById(id);
     }
 
+    [Authorize(Policy = "Admin")]
     [HttpPut(nameof(UpdateUser))]
     public async Task UpdateUser([FromBody]UpdateUserDto dto)
     {

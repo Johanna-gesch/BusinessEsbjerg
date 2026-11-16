@@ -17,6 +17,11 @@ export enum HolidayRequestStatus {
   Cancelled = 3,
 }
 
+export enum SalaryType {
+  Hourly = 0,
+  Monthly = 1,
+}
+
 export enum HolidayTransactionType {
   Earned = 0,
   Used = 1,
@@ -82,6 +87,17 @@ export interface CreateCalendarDayDTO {
   name: string;
 }
 
+export interface SalaryHistory {
+  /** @format guid */
+  id: string;
+  userId: string;
+  /** @format date */
+  effectiveFrom: string;
+  salaryType: SalaryType;
+  /** @format decimal */
+  salary: number;
+}
+
 export interface CreateUserDto {
   username: string;
   password: string;
@@ -94,6 +110,9 @@ export interface User {
   passwordHash: string;
   isAdmin: boolean;
   isActive: boolean;
+  salaryType: SalaryType;
+  /** @format decimal */
+  salary: number;
   holidayAccounts: HolidayAccount[];
   holidayRequests: HolidayRequest[];
 }
@@ -123,6 +142,9 @@ export interface HolidayRequest {
 export interface UpdateUserDto {
   userId: string;
   username: string;
+  salaryType: SalaryType;
+  /** @format decimal */
+  salary?: number | null;
 }
 
 export interface LoginResponseDTO {
@@ -155,6 +177,10 @@ export interface AccountGetAccountByIdParams {
 }
 
 export interface AccountGetAccountsForUserParams {
+  userId?: string;
+}
+
+export interface SalaryGetSalaryHistoryForUserParams {
   userId?: string;
 }
 
@@ -472,6 +498,28 @@ export class Api<
     ) =>
       this.request<HolidayAccount[], any>({
         path: `/GetAccountsForUser`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getSalaryHistoryForUser = {
+    /**
+     * No description
+     *
+     * @tags Salary
+     * @name SalaryGetSalaryHistoryForUser
+     * @request GET:/GetSalaryHistoryForUser
+     * @secure
+     */
+    salaryGetSalaryHistoryForUser: (
+      query: SalaryGetSalaryHistoryForUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<SalaryHistory[], any>({
+        path: `/GetSalaryHistoryForUser`,
         method: "GET",
         query: query,
         secure: true,

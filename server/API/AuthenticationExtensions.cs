@@ -21,6 +21,7 @@ public static class AuthenticationExtensions
     {
         services.AddScoped<IPasswordHasher, Argon2PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
+        
         services.AddScoped<UserService>();
         services.AddScoped<IUserRepo, UserRepo>();
 
@@ -32,6 +33,9 @@ public static class AuthenticationExtensions
         
         services.AddScoped<AccountService>();
         services.AddScoped<IAccountRepo, AccountRepo>();
+
+        services.AddScoped<SalaryHistoryService>();
+        services.AddScoped<ISalaryHistoryRepo, SalaryHistoryRepo>();
         
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 

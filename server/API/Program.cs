@@ -37,12 +37,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().SetIsOriginAllowed(_ => true));
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOpenApi();
 app.UseSwaggerUi();
-app.UseExceptionHandler();
+
 
 
 if (app.Environment.IsEnvironment("Testing"))
