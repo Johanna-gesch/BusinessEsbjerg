@@ -1,5 +1,6 @@
 ﻿
 using Infra.Entities;
+using Infra.Entities.Users;
 using Service;
 using Tests.UnitTests.Stubs;
 

@@ -8,6 +8,7 @@ using Infra.Entities.HolidayTracking.Rules;
 using Infra.Entities.HolidayTracking.Salary;
 using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Entities.HolidayTracking.WorkSchedule;
+using Infra.Entities.Users;
 
 namespace Infra;
 

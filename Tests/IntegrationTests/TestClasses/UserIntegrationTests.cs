@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Infra.Entities;
+using Infra.Entities.Users;
 
 namespace Tests.IntegrationTests.TestClasses;
 

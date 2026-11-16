@@ -1,5 +1,5 @@
 ﻿using Infra;
-using Infra.Entities;
+using Infra.Entities.Users;
 using Infra.Entities.HolidayTracking.Salary;
 using Service.DTOs.UserDTOs;
 using Infra.Repositories.Interfaces;
@@ -71,7 +71,7 @@ public class UserService(
             UserId = Guid.NewGuid().ToString(),
             Username = dto.Username,
             PasswordHash = hasher.HashAndSaltPassword(dto.Password),
-            IsAdmin = dto.IsAdmin,
+            Role = dto.Role,
         };
         await repo.Insert(newUser);
 
@@ -81,7 +81,7 @@ public class UserService(
     public async Task Delete(string userId)
     {
         if (string.IsNullOrWhiteSpace(userId))
-            throw new Infra.ValidationException("User id cannot be null or empty");
+            throw new ValidationException("User id cannot be null or empty");
 
         var user = await repo.GetById(userId) ?? throw new NotFoundException($"User with id '{userId}' not found");
 

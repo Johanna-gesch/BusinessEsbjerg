@@ -1,4 +1,5 @@
 ﻿using Infra.Entities;
+using Infra.Entities.Users;
 using Infra.Repositories.Interfaces;
 
 namespace Tests.UnitTests.Stubs;

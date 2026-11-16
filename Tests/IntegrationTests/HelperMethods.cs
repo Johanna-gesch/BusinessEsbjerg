@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using Infra.Entities;
 using Infra.Entities.HolidayTracking.Accounts;
+using Infra.Entities.Users;
 using Infra.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Service;
