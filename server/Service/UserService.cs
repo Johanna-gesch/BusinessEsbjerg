@@ -1,6 +1,5 @@
 ﻿using Infra;
 using Infra.Entities;
-using Infra.Entities.HolidayTracking.Salary;
 using Service.DTOs.UserDTOs;
 using Infra.Repositories.Interfaces;
 using Service.HolidayServices;
@@ -11,7 +10,6 @@ namespace Service;
 public class UserService(
     IUserRepo repo ,
     IPasswordHasher hasher,
-    SalaryHistoryService salService,
     AccountService accountService)
 {
     public async Task<List<User>> GetAll() {
@@ -31,33 +29,11 @@ public class UserService(
     {
         var user = await repo.GetById(dto.UserId)
             ?? throw new ValidationException("User not found");
-
-        // Check whether salary has changed BEFORE updating user
-        bool salaryChanged = 
-            user.SalaryType != dto.SalaryType || 
-            user.Salary != dto.Salary;
         
         if (!string.IsNullOrWhiteSpace(dto.Username))
             user.Username = dto.Username;
         
-        user.SalaryType = dto.SalaryType;
-        
-        if (dto.Salary.HasValue)
-            user.Salary = dto.Salary.Value;
-        
         await repo.Update(user);
-
-        if (salaryChanged)
-        {
-            await salService.Create(new SalaryHistory
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.UserId,
-                EffectiveFrom = DateOnly.FromDateTime(DateTime.Now),
-                SalaryType = user.SalaryType,
-                Salary = user.Salary,
-            });
-        }
     }
 
     

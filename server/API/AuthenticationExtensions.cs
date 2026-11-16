@@ -30,9 +30,6 @@ public static class AuthenticationExtensions
         
         services.AddScoped<AccountService>();
         services.AddScoped<IAccountRepo, AccountRepo>();
-
-        services.AddScoped<SalaryHistoryService>();
-        services.AddScoped<ISalaryHistoryRepo, SalaryHistoryRepo>();
         
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
