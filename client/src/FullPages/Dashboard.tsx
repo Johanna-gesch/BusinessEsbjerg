@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {SalaryHistory} from "@/Components/SalaryHistory.tsx";
+import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkScheduleCard.tsx";
 
 interface LoggedInUser {
     userId: string;
@@ -32,6 +33,7 @@ export function Dashboard() {
                     </button>
                 )}
             </header>
+            <WorkScheduleCard userId={user.userId}/>
             <SalaryHistory userId={user.userId} />
         </div>
     )
