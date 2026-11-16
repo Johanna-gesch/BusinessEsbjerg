@@ -17,6 +17,11 @@ export enum HolidayRequestStatus {
   Cancelled = 3,
 }
 
+export enum SalaryType {
+  Hourly = 0,
+  Monthly = 1,
+}
+
 export enum HolidayTransactionType {
   Earned = 0,
   Used = 1,
@@ -68,9 +73,29 @@ export interface HolidayTransaction {
   description?: string | null;
 }
 
-export interface CreateHolidayAccountDto {
+export interface CalendarDayDTO {
+  /** @format guid */
+  id: string;
+  /** @format date */
+  date: string;
+  name: string;
+}
+
+export interface CreateCalendarDayDTO {
+  /** @format date */
+  date: string;
+  name: string;
+}
+
+export interface SalaryHistory {
+  /** @format guid */
+  id: string;
   userId: string;
-  type: HolidayType;
+  /** @format date */
+  effectiveFrom: string;
+  salaryType: SalaryType;
+  /** @format decimal */
+  salary: number;
 }
 
 export interface CreateUserDto {
@@ -85,6 +110,9 @@ export interface User {
   passwordHash: string;
   isAdmin: boolean;
   isActive: boolean;
+  salaryType: SalaryType;
+  /** @format decimal */
+  salary: number;
   holidayAccounts: HolidayAccount[];
   holidayRequests: HolidayRequest[];
 }
@@ -114,6 +142,9 @@ export interface HolidayRequest {
 export interface UpdateUserDto {
   userId: string;
   username: string;
+  salaryType: SalaryType;
+  /** @format decimal */
+  salary?: number | null;
 }
 
 export interface LoginResponseDTO {
@@ -131,6 +162,10 @@ export interface AccountGetAccountByIdParams {
 }
 
 export interface AccountGetAccountsForUserParams {
+  userId?: string;
+}
+
+export interface SalaryGetSalaryHistoryForUserParams {
   userId?: string;
 }
 
@@ -405,29 +440,6 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
-  createAccount = {
-    /**
-     * No description
-     *
-     * @tags Account
-     * @name AccountCreateAccount
-     * @request POST:/CreateAccount
-     * @secure
-     */
-    accountCreateAccount: (
-      data: CreateHolidayAccountDto,
-      params: RequestParams = {},
-    ) =>
-      this.request<HolidayAccount, any>({
-        path: `/CreateAccount`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
   getAccountById = {
     /**
      * No description
@@ -468,6 +480,51 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getSalaryHistoryForUser = {
+    /**
+     * No description
+     *
+     * @tags Salary
+     * @name SalaryGetSalaryHistoryForUser
+     * @request GET:/GetSalaryHistoryForUser
+     * @secure
+     */
+    salaryGetSalaryHistoryForUser: (
+      query: SalaryGetSalaryHistoryForUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<SalaryHistory[], any>({
+        path: `/GetSalaryHistoryForUser`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createCalendarDay = {
+    /**
+     * No description
+     *
+     * @tags CalendarDay
+     * @name CalendarDayCreateCalendarDay
+     * @request POST:/CreateCalendarDay
+     * @secure
+     */
+    calendarDayCreateCalendarDay: (
+      data: CreateCalendarDayDTO,
+      params: RequestParams = {},
+    ) =>
+      this.request<CalendarDayDTO, any>({
+        path: `/CreateCalendarDay`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

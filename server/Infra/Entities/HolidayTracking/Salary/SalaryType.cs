@@ -3,5 +3,5 @@
 public enum SalaryType
 {
     Hourly,
-    Monthly
+    Monthly,
 }

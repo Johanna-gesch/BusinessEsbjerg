@@ -6,10 +6,10 @@ namespace Tests.UnitTests.Stubs;
 public class UserRepoStub : IUserRepo
 {
     private readonly List<User> _users = new();
-    public Task Insert(User user)
+    public async Task Insert(User user)
     {
         _users.Add(user);
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     public async Task<User?> GetById(string id)
