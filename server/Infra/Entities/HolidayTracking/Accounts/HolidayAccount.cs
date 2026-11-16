@@ -9,7 +9,6 @@ public class HolidayAccount
 {
     [PrimaryKey] public Guid Id { get; set; }
     [Column] public string UserId { get; set; } = "";
-    
     [Column] public HolidayType Type { get; set; } = HolidayType.Week1_5;
 
     [Association(ThisKey = nameof(Id), OtherKey = nameof(HolidayEarning.HolidayAccountId))]

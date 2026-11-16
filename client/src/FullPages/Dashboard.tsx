@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {SalaryHistory} from "@/Components/SalaryHistory.tsx";
+import {LogOutButton} from "@/Components/LogOutButtn.tsx";
 import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkScheduleCard.tsx";
 
 interface LoggedInUser {
@@ -24,6 +25,7 @@ export function Dashboard() {
 
     return (
         <div>
+            <LogOutButton />
             <header className="dashboard-header">
                 <h1>HI {user.username}!</h1>
 
