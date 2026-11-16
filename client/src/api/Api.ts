@@ -503,28 +503,6 @@ export class Api<
         ...params,
       }),
   };
-  getSalaryHistoryForUser = {
-    /**
-     * No description
-     *
-     * @tags Salary
-     * @name SalaryGetSalaryHistoryForUser
-     * @request GET:/GetSalaryHistoryForUser
-     * @secure
-     */
-    salaryGetSalaryHistoryForUser: (
-      query: SalaryGetSalaryHistoryForUserParams = {},
-      params: RequestParams = {},
-    ) =>
-      this.request<SalaryHistory[], any>({
-        path: `/GetSalaryHistoryForUser`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
   createUser = {
     /**
      * No description
