@@ -1,7 +1,7 @@
 
 import apiClient from "@/services/ApiClient.ts";
 import { useState } from "react";
-import { SalaryType, type User } from "@/api/Api.ts";
+import { type User } from "@/api/Api.ts";
 
 const MyApi = apiClient.api;
 
@@ -14,17 +14,13 @@ type EditUserProps = {
 type EditForm = {
     username: string;
     password: string;
-    salaryType: SalaryType;
-    salary: string;
 };
 
-export function EditUser({ user, onClose, onUpdated }: EditUserProps) {
+export function EditUserForm({ user, onClose, onUpdated }: EditUserProps) {
 
     const [editForm, setEditForm] = useState<EditForm>({
         username: user.username,
         password: "",
-        salaryType: user.salaryType,
-        salary: String(user.salary)
     });
 
     function handleSaveUser(e: React.FormEvent) {
@@ -33,15 +29,12 @@ export function EditUser({ user, onClose, onUpdated }: EditUserProps) {
         MyApi.updateUser.userUpdateUser({
             userId: user.userId,
             username: editForm.username,
-            salaryType: editForm.salaryType,
-            salary: Number(editForm.salary)
+            password: editForm.password
         })
             .then(() => {
                 onUpdated({
                     ...user,
                     username: editForm.username,
-                    salaryType: editForm.salaryType,
-                    salary: Number(editForm.salary)
                 });
 
                 onClose();
@@ -61,14 +54,7 @@ export function EditUser({ user, onClose, onUpdated }: EditUserProps) {
             alignItems: "center",
             zIndex: 1000
         }}>
-            <div style={{
-                backgroundColor: "white",
-                padding: "30px",
-                borderRadius: "10px",
-                width: "400px",
-                maxWidth: "90%",
-                color: "black"
-            }}>
+            <div>
                 <h2>Edit User</h2>
 
                 <form onSubmit={handleSaveUser}>
@@ -100,41 +86,6 @@ export function EditUser({ user, onClose, onUpdated }: EditUserProps) {
                                     password: e.target.value
                                 })
                             }
-                        />
-                    </div>
-
-                    <div>
-                        <label>Salary Type</label>
-                        <select
-                            value={String(editForm.salaryType)}
-                            onChange={e =>
-                                setEditForm({
-                                    ...editForm,
-                                    salaryType: Number(e.target.value) as SalaryType
-                                })
-                            }
-                        >
-                            <option value={String(SalaryType.Hourly)}>
-                                Hourly
-                            </option>
-                            <option value={String(SalaryType.Monthly)}>
-                                Monthly
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Salary</label>
-                        <input
-                            type="number"
-                            value={editForm.salary}
-                            onChange={e =>
-                                setEditForm({
-                                    ...editForm,
-                                    salary: e.target.value
-                                })
-                            }
-                            required
                         />
                     </div>
 

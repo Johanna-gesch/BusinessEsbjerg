@@ -4,8 +4,6 @@ using Infra.Entities.HolidayTracking;
 using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Entities.HolidayTracking.Requests;
-using Infra.Entities.HolidayTracking.Rules;
-using Infra.Entities.HolidayTracking.Salary;
 using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Entities.HolidayTracking.WorkSchedule;
 using LinqToDB;
@@ -31,10 +29,6 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
         dc.CreateTable<WorkSchedule>(tableOptions: TableOptions.CreateIfNotExists);
 
         dc.CreateTable<WorkScheduleHistory>(tableOptions: TableOptions.CreateIfNotExists);
-
-        dc.CreateTable<SalaryHistory>(tableOptions: TableOptions.CreateIfNotExists);
-
-        dc.CreateTable<RuleParameter>(tableOptions: TableOptions.CreateIfNotExists);
 
         dc.CreateTable<CalendarDay>(tableOptions: TableOptions.CreateIfNotExists);
     }
