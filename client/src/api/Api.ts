@@ -88,6 +88,21 @@ export interface CreateCalendarDayDTO {
   name: string;
 }
 
+export interface HolidayTransactionDto {
+  /** @format guid */
+  id: string;
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format guid */
+  holidayEarningId?: string | null;
+  /** @format decimal */
+  amountHours: number;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+}
+
 export interface CreateUserDto {
   username: string;
   password: string;
@@ -163,6 +178,24 @@ export interface AccountGetAccountByIdParams {
 
 export interface AccountGetAccountsForUserParams {
   userId?: string;
+}
+
+export interface TransactionGetTransactionHistoryParams {
+  /** @format guid */
+  accountId?: string;
+}
+
+export interface TransactionCreateTransactionParams {
+  /** @format guid */
+  HolidayAccountId?: string;
+  /** @format guid */
+  HolidayEarningId?: string | null;
+  /** @format decimal */
+  AmountHours?: number;
+  /** @format date */
+  TransactionDate?: string;
+  TransactionType?: HolidayTransactionType;
+  Description?: string | null;
 }
 
 export interface UserGetUserByIdParams {
@@ -505,6 +538,50 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  getTransactionHistory = {
+    /**
+     * No description
+     *
+     * @tags Transaction
+     * @name TransactionGetTransactionHistory
+     * @request GET:/GetTransactionHistory
+     * @secure
+     */
+    transactionGetTransactionHistory: (
+      query: TransactionGetTransactionHistoryParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayTransactionDto[], any>({
+        path: `/GetTransactionHistory`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createTransaction = {
+    /**
+     * No description
+     *
+     * @tags Transaction
+     * @name TransactionCreateTransaction
+     * @request POST:/CreateTransaction
+     * @secure
+     */
+    transactionCreateTransaction: (
+      query: TransactionCreateTransactionParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayTransactionDto, any>({
+        path: `/CreateTransaction`,
+        method: "POST",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

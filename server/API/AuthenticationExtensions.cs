@@ -34,13 +34,13 @@ public static class AuthenticationExtensions
         
         services.AddScoped<AccountService>();
         services.AddScoped<IAccountRepo, AccountRepo>();
-
-        services.AddScoped<WorkScheduleService>();
-        services.AddScoped<IWorkScheduleRepo, WorkScheduleRepo>();
         
         services.AddScoped<EarningService>();
         services.AddScoped<EarningCalculator>();
         services.AddScoped<IEarningRepo, EarningRepo>();
+      
+        services.AddScoped<TransactionService>();
+        services.AddScoped<ITransactionRepo, TransactionRepo>();
         
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
