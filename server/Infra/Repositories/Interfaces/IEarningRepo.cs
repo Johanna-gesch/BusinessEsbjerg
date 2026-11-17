@@ -4,6 +4,11 @@ namespace Infra.Repositories.Interfaces;
 
 public interface IEarningRepo
 {
-    Task SaveEarnings(HolidayEarning earning);
+    Task SaveEarningsTransaction(List<HolidayEarning> earnings);
+    
+    Task<List<HolidayEarning>> GetEarningsByAccount(Guid accountId);
+    
+    Task<bool> EarningsExist(Guid accountId, DateOnly earnedDate);
+
 
 }

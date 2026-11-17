@@ -10,5 +10,6 @@ public class HolidayEarning
     
     [Column] public DateOnly EarnedDate { get; set; }
     [Column] public decimal EarnedHours { get; set; }
+    [Column] public decimal EarnedDays { get; set; }
     [Column] public DateOnly ExpiryDate { get; set; }
 }

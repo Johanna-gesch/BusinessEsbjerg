@@ -1,6 +1,5 @@
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
-import {SalaryHistory} from "@/Components/SalaryHistory.tsx";
 import {LogOutButton} from "@/Components/LogOutButtn.tsx";
 
 interface LoggedInUser {
