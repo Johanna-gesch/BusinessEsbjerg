@@ -7,6 +7,8 @@ namespace Service.HolidayServices;
 
 public class TransactionService(ITransactionRepo transactionRepo, IAccountRepo accountRepo)
 {
+    // Retrieves the account's transactions and converts each database entity
+    // into a DTO before returning the history to the caller.
     public async Task<List<HolidayTransactionDto>> GetHistory(Guid accountId)
     {
         if (accountId == Guid.Empty)
@@ -16,6 +18,8 @@ public class TransactionService(ITransactionRepo transactionRepo, IAccountRepo a
         return transactions.Select(ToDto).ToList();
     }
 
+    // Validates the request, creates and saves a transaction entity,
+    // then converts it to a DTO for the response.
     public async Task<HolidayTransactionDto> Create(CreateHolidayTransactionDto dto)
     {
         if (dto.HolidayAccountId == Guid.Empty)
@@ -48,6 +52,8 @@ public class TransactionService(ITransactionRepo transactionRepo, IAccountRepo a
 
         if (await accountRepo.GetByIdAsync(dto.HolidayAccountId) is null)
             throw new NotFoundException("Holiday account not found");
+        
+        // Map the validated request DTO to the entity that is stored in the database.
         var entity = new HolidayTransaction
         {
             Id = Guid.NewGuid(),
@@ -58,13 +64,16 @@ public class TransactionService(ITransactionRepo transactionRepo, IAccountRepo a
             TransactionType = dto.TransactionType,
             Description = dto.Description
         };
-
+        
+        // Return a DTO instead of exposing the database entity to the caller.
         await transactionRepo.Insert(entity);
         return ToDto(entity);
     }
     
     
 
+    // Converts a database entity into the response DTO.
+    // This keeps the persistence model separate from the data returned to the caller.
     private static HolidayTransactionDto ToDto (HolidayTransaction t) => new()
     {
         Id = t.Id,
