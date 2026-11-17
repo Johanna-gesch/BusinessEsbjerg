@@ -33,7 +33,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = "",
                 Password = "test123",
-                Role = "Admin"
+                Role = UserRole.User
             }
         );
 
@@ -54,7 +54,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = "testuser",
                 Password = "",
-                Role = "User"
+                Role = UserRole.User
             }
         );
 
@@ -77,7 +77,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = username,
                 Password = "test123",
-                Role = "User"
+                Role = UserRole.User
             }
         );
 
@@ -124,7 +124,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = username,
                 Password = "test123",
-                Role = "Admin"
+                Role = UserRole.User
             }
         );
 
@@ -175,7 +175,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = username,
                 Password = "test123",
-                Role = "User"
+                Role = UserRole.User
             }
         );
 

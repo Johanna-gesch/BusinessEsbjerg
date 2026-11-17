@@ -15,7 +15,7 @@ public class UserServiceTests
     private readonly UserService _service;
     private readonly UserRepoStub _userRepo = new();
     private readonly AccountRepoStub _accountRepoStub = new();
-    private readonly HasherStub _hasher = new();
+    private readonly IPasswordHasher _hasher = new Argon2PasswordHasher();
 
     public UserServiceTests()
     {
@@ -50,8 +50,10 @@ public class UserServiceTests
         Assert.False(string.IsNullOrWhiteSpace(users.First().UserId));
         
         // Password should be hashed before saving
-        Assert.Equal("hashed_TestPassword", users.First().PasswordHash);
         Assert.NotEqual("TestPassword", users.First().PasswordHash);
+        Assert.True(
+            _hasher.VerifyPassword("TestPassword", users.First().PasswordHash)
+            );
     }
     
     [Fact]
