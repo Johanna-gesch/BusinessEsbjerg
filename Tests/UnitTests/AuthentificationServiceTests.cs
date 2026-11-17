@@ -1,5 +1,6 @@
 ﻿
 using Infra.Entities;
+using Infra.Entities.Users;
 using Service;
 using Tests.UnitTests.Stubs;
 
@@ -29,7 +30,7 @@ public class AuthenticationServiceTests
             UserId = "123",
             Username = "testuser",
             PasswordHash = _hasher.HashAndSaltPassword("password123"),
-            IsAdmin = false
+            Role = UserRole.User
         };
 
         await _userRepo.Insert(user);
@@ -68,7 +69,7 @@ public class AuthenticationServiceTests
             UserId = "123",
             Username = "testuser",
             PasswordHash = _hasher.HashAndSaltPassword("correctPassword"),
-            IsAdmin = false
+            Role = UserRole.User
         };
 
         await _userRepo.Insert(user);

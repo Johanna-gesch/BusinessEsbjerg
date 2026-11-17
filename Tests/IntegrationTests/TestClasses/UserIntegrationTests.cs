@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Infra.Entities;
+using Infra.Entities.Users;
 
 namespace Tests.IntegrationTests.TestClasses;
 
@@ -32,7 +33,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = "",
                 Password = "test123",
-                IsAdmin = false
+                Role = "Admin"
             }
         );
 
@@ -53,7 +54,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = "testuser",
                 Password = "",
-                IsAdmin = false
+                Role = "User"
             }
         );
 
@@ -76,7 +77,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = username,
                 Password = "test123",
-                IsAdmin = false
+                Role = "User"
             }
         );
 
@@ -123,7 +124,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = username,
                 Password = "test123",
-                IsAdmin = false
+                Role = "Admin"
             }
         );
 
@@ -174,7 +175,7 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             {
                 Username = username,
                 Password = "test123",
-                IsAdmin = false
+                Role = "User"
             }
         );
 

@@ -1,4 +1,5 @@
 using Infra.Entities;
+using Infra.Entities.Users;
 
 namespace Service.Security;
 

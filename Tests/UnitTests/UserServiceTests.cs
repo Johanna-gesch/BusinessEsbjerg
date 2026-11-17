@@ -1,5 +1,6 @@
 ﻿using Infra;
 using Infra.Entities;
+using Infra.Entities.Users;
 using Service;
 using Service.DTOs.UserDTOs;
 using Service.HolidayServices;
@@ -13,7 +14,6 @@ public class UserServiceTests
     
     private readonly UserService _service;
     private readonly UserRepoStub _userRepo = new();
-    private readonly SalaryHistoryStub _salHisStub = new();
     private readonly AccountRepoStub _accountRepoStub = new();
     private readonly HasherStub _hasher = new();
 
@@ -35,7 +35,7 @@ public class UserServiceTests
         {
             Username = "TestUser",
             Password = "TestPassword",
-            IsAdmin = false
+            Role = UserRole.User
         };
         
         //Act
@@ -46,7 +46,7 @@ public class UserServiceTests
         
         Assert.Single(users); //Only 1 user created
         Assert.Equal("TestUser", users.First().Username);
-        Assert.False(users.First().IsAdmin);
+        Assert.False(users.First().Role == UserRole.Admin);
         Assert.False(string.IsNullOrWhiteSpace(users.First().UserId));
         
         // Password should be hashed before saving
@@ -92,7 +92,7 @@ public class UserServiceTests
         {
             Username = "TestUser",
             Password = "TestPassword",
-            IsAdmin = false
+            Role = UserRole.User
         };
 
         // Act

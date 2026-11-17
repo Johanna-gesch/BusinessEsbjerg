@@ -73,11 +73,7 @@ public static class AuthenticationExtensions
             settings.OperationProcessors.Add(
                 new AspNetCoreOperationSecurityScopeProcessor("JWT"));
         });
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("Admin", policy =>
-                policy.RequireClaim("isAdmin", "true"));
-        });
+        services.AddAuthorization();
 
         return services;
 

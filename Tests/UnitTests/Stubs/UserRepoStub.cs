@@ -1,4 +1,5 @@
 ﻿using Infra.Entities;
+using Infra.Entities.Users;
 using Infra.Repositories.Interfaces;
 
 namespace Tests.UnitTests.Stubs;
@@ -29,7 +30,7 @@ public class UserRepoStub : IUserRepo
         {
             existingUser.Username = user.Username;
             existingUser.PasswordHash = user.PasswordHash;
-            existingUser.IsAdmin = user.IsAdmin;
+            existingUser.Role = user.Role;
         }
 
         return Task.CompletedTask;
