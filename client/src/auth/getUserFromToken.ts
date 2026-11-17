@@ -1,7 +1,7 @@
+import { UserRole, type User } from "@/api/Api";
+import type {LoggedInUser} from "@/Interfaces/LoggedInUser.tsx";
 
-import type { User } from "@/api/Api";
-
-export function getUserFromToken(token: string): User | null {
+export function getUserFromToken(token: string): LoggedInUser | null {
     try {
         // Et JWT består af tre dele adskilt af punktummer.
         const payload = token.split(".")[1];
@@ -30,18 +30,23 @@ export function getUserFromToken(token: string): User | null {
             claims["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
             ?? claims.unique_name;
 
-        if (!userId || !userName) {
+        const roleClaim=
+            claims["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+        if (!userId || !userName || !roleClaim) {
             return null;
         }
 
-        const isAdmin = String(claims.isAdmin).toLowerCase() === "true";
+        const role = UserRole[roleClaim as keyof typeof UserRole];
 
+        if (role === undefined) {
+            return null;
+        }
 
         return {
             userId: String(userId),
             username: String(userName),
-            passwordHash: "",
-            isAdmin,
+            role
         };
     } catch {
         return null;

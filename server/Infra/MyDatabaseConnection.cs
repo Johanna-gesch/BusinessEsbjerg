@@ -6,6 +6,7 @@ using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Entities.HolidayTracking.Requests;
 using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Entities.HolidayTracking.WorkSchedule;
+using Infra.Entities.Users;
 
 namespace Infra;
 

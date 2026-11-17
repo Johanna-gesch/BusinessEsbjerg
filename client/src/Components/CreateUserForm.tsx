@@ -1,6 +1,6 @@
 import {type Dispatch, type SetStateAction, useState} from "react";
 import apiClient from "@/services/ApiClient.ts";
-import type {User} from "@/api/Api.ts";
+import {type User, UserRole} from "@/api/Api.ts";
 
 const MyApi = apiClient.api;
 
@@ -12,14 +12,14 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
 
     const [usernameField, setUsernameField] = useState("");
     const [passwordField, setPasswordField] = useState("");
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [role, setRole] = useState<UserRole>(UserRole.User);
 
     async function handleCreateUser() {
         try {
             await MyApi.createUser.userCreateUser({
                 username: usernameField,
                 password: passwordField,
-                isAdmin: isAdmin
+                role: role,
             });
 
             const updatedUsers = await MyApi.getUsers.userGetUsers();
@@ -28,6 +28,7 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
 
             setUsernameField("");
             setPasswordField("");
+            setRole(UserRole.User);
         } catch (error) {
             console.error("Could not create user:", error);
         }
@@ -48,11 +49,12 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
                 onChange={e => setPasswordField(e.target.value)}
             />
             <select
-                value={isAdmin ? "admin" : "user"}
-                onChange={(e) => setIsAdmin(e.target.value === "admin")}
+                value={role}
+                onChange={(e) => setRole(Number(e.target.value) as UserRole)}
             >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value={UserRole.User}>User</option>
+                <option value={UserRole.Admin}>Admin</option>
+                <option value={UserRole.Accountant}>Accountant</option>
             </select>
             <button
                 type={"button"}
@@ -60,7 +62,6 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
             >
                 Save
             </button>
-
         </div>
     )
 }
