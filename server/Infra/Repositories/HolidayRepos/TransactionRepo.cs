@@ -18,4 +18,9 @@ public class TransactionRepo(MyDatabaseConnection dc) : ITransactionRepo
             .OrderByDescending(t => t.TransactionDate)
             .ToListAsync();
     }
+
+    public async Task Insert(HolidayTransaction transaction)
+    {
+        await dc.InsertAsync(transaction);
+    }
 }
