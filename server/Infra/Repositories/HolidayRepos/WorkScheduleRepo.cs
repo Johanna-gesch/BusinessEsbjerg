@@ -1,4 +1,5 @@
-﻿using Infra.Entities.HolidayTracking.WorkSchedule;
+﻿
+using Infra.Entities.HolidayTracking.WorkSchedule;
 using Infra.Repositories.Interfaces;
 using LinqToDB;
 using LinqToDB.Async;
@@ -6,8 +7,8 @@ using LinqToDB.Async;
 namespace Infra.Repositories.HolidayRepos;
 
 /**
-
-Get and set the work schedules.*/
+ * Get and set the work schedules.
+ */
 public class WorkScheduleRepo(MyDatabaseConnection dc) : IWorkScheduleRepo
 {
     public async Task<WorkSchedule?> GetCurrent(string userId)

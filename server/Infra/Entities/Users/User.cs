@@ -2,7 +2,7 @@
 using Infra.Entities.HolidayTracking.Requests;
 using LinqToDB.Mapping;
 
-namespace Infra.Entities;
+namespace Infra.Entities.Users;
 
 [Table("User")]
 public class User
@@ -10,7 +10,7 @@ public class User
     [PrimaryKey] public string UserId { get; set; } = "";
     [Column] public string Username { get; set; } = "";
     [Column] public string PasswordHash { get; set; } = "";
-    [Column] public bool IsAdmin { get; set; } = false;
+    [Column] public UserRole Role { get; set; } = UserRole.User;
     [Column] public bool IsActive { get; set; } = true;
 
     [Association(ThisKey = nameof(UserId), OtherKey = nameof(HolidayAccount.UserId))]

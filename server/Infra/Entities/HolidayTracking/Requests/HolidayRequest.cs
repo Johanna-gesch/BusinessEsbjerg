@@ -1,5 +1,6 @@
 ﻿using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Entities.HolidayTracking.Requests;
+using Infra.Entities.Users;
 using LinqToDB.Mapping;
 
 namespace Infra.Entities.HolidayTracking.Requests;

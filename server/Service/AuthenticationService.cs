@@ -1,4 +1,5 @@
 using Infra.Entities;
+using Infra.Entities.Users;
 using Infra.Repositories;
 using Infra.Repositories.Interfaces;
 using Service.Security;

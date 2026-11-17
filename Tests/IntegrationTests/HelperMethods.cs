@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using Infra.Entities;
 using Infra.Entities.HolidayTracking.Accounts;
+using Infra.Entities.Users;
 using Infra.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Service;
@@ -50,7 +51,7 @@ public class HelperMethods
                 UserId = Guid.NewGuid().ToString(),
                 Username = username,
                 PasswordHash = hasher.HashAndSaltPassword(password),
-                IsAdmin = true
+                Role = UserRole.Admin
             };
 
             await repo.Insert(admin);
@@ -98,7 +99,7 @@ public class HelperMethods
         {
             Username = username,
             Password = "TestPassword123",
-            IsAdmin = false
+            Role = UserRole.User
         });
 
         var user = await userRepo.GetByUsername(username);
