@@ -1,6 +1,8 @@
-﻿using Infra;
+﻿using System.ComponentModel.DataAnnotations;
+using Infra;
 using Infra.Entities;
 using Infra.Entities.Users;
+using Microsoft.AspNetCore.Identity;
 using Service;
 using Service.DTOs.UserDTOs;
 using Service.HolidayServices;
