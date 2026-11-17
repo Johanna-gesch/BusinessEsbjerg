@@ -30,7 +30,7 @@ public class UserRepoStub : IUserRepo
         {
             existingUser.Username = user.Username;
             existingUser.PasswordHash = user.PasswordHash;
-            existingUser.IsAdmin = user.IsAdmin;
+            existingUser.Role = user.Role;
         }
 
         return Task.CompletedTask;

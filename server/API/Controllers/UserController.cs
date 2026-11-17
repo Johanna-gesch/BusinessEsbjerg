@@ -11,7 +11,7 @@ namespace API.Controllers;
 [ApiController]
 public class UserController(UserService service, IAuthenticationService authenticationService) : ControllerBase
 {
-    [Authorize(Policy = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPost(nameof(CreateUser))]
     public async Task CreateUser([FromBody] CreateUserDto dto)
     {
@@ -30,7 +30,7 @@ public class UserController(UserService service, IAuthenticationService authenti
         return await service.GetById(id);
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPut(nameof(UpdateUser))]
     public async Task UpdateUser([FromBody]UpdateUserDto dto)
     {
@@ -61,7 +61,4 @@ public class UserController(UserService service, IAuthenticationService authenti
             Token = token
         });
     }
-    
-    
-    
 }

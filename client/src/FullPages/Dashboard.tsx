@@ -1,13 +1,8 @@
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
-import {SalaryHistory} from "@/Components/SalaryHistory.tsx";
 import {LogOutButton} from "@/Components/LogOutButtn.tsx";
-
-interface LoggedInUser {
-    userId: string;
-    username: string;
-    isAdmin: boolean;
-}
+import {UserRole} from "@/api/Api.ts";
+import type {LoggedInUser} from "@/Interfaces/LoggedInUser.tsx";
 
 export function Dashboard() {
 
@@ -28,7 +23,7 @@ export function Dashboard() {
             <header className="dashboard-header">
                 <h1>HI {user.username}!</h1>
 
-                {user.isAdmin && (
+                {user.role == UserRole.Admin && (
                     <button onClick={() => navigate("/admin")}>
                         Admin
                     </button>

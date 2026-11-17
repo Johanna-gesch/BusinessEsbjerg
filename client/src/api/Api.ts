@@ -17,6 +17,12 @@ export enum HolidayRequestStatus {
   Cancelled = 3,
 }
 
+export enum UserRole {
+  User = 0,
+  Admin = 1,
+  Accountant = 2,
+}
+
 export enum HolidayTransactionType {
   Earned = 0,
   Used = 1,
@@ -85,14 +91,14 @@ export interface CreateCalendarDayDTO {
 export interface CreateUserDto {
   username: string;
   password: string;
-  isAdmin: boolean;
+  role: UserRole;
 }
 
 export interface User {
   userId: string;
   username: string;
   passwordHash: string;
-  isAdmin: boolean;
+  role: UserRole;
   isActive: boolean;
   holidayAccounts: HolidayAccount[];
   holidayRequests: HolidayRequest[];

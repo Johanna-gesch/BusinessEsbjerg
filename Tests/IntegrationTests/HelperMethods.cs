@@ -51,7 +51,7 @@ public class HelperMethods
                 UserId = Guid.NewGuid().ToString(),
                 Username = username,
                 PasswordHash = hasher.HashAndSaltPassword(password),
-                IsAdmin = true
+                Role = UserRole.Admin
             };
 
             await repo.Insert(admin);
@@ -99,7 +99,7 @@ public class HelperMethods
         {
             Username = username,
             Password = "TestPassword123",
-            IsAdmin = false
+            Role = UserRole.User
         });
 
         var user = await userRepo.GetByUsername(username);

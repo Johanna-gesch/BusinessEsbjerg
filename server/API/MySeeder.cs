@@ -44,7 +44,7 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
                 {
                     UserId = i.ToString(),
                     Username = $"User {i}",
-                    IsAdmin = i == 1,
+                    Role = 0,
                     IsActive = true
                 });
             }
@@ -65,7 +65,7 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
                 UserId = Guid.NewGuid().ToString(),
                 Username = username,
                 PasswordHash = hasher.HashAndSaltPassword(password),
-                IsAdmin = true,
+                Role = 0,
                 IsActive = true
             });
         }
