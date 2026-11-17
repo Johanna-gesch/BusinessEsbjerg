@@ -33,6 +33,6 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
         env:
-          jwtSecret: ${{ secrets.jwtSecret }}
+          JwtSecret: ${{ secrets.jwtSecret }}
           TEST_DB: ${{ secrets.TEST_DB }}
           
