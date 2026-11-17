@@ -13,7 +13,6 @@ public class UserServiceTests
     
     private readonly UserService _service;
     private readonly UserRepoStub _userRepo = new();
-    private readonly SalaryHistoryStub _salHisStub = new();
     private readonly AccountRepoStub _accountRepoStub = new();
     private readonly HasherStub _hasher = new();
 
