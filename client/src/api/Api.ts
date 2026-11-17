@@ -185,6 +185,19 @@ export interface TransactionGetTransactionHistoryParams {
   accountId?: string;
 }
 
+export interface TransactionCreateTransactionParams {
+  /** @format guid */
+  HolidayAccountId?: string;
+  /** @format guid */
+  HolidayEarningId?: string | null;
+  /** @format decimal */
+  AmountHours?: number;
+  /** @format date */
+  TransactionDate?: string;
+  TransactionType?: HolidayTransactionType;
+  Description?: string | null;
+}
+
 export interface UserGetUserByIdParams {
   id?: string;
 }
@@ -545,6 +558,28 @@ export class Api<
       this.request<HolidayTransactionDto[], any>({
         path: `/GetTransactionHistory`,
         method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createTransaction = {
+    /**
+     * No description
+     *
+     * @tags Transaction
+     * @name TransactionCreateTransaction
+     * @request POST:/CreateTransaction
+     * @secure
+     */
+    transactionCreateTransaction: (
+      query: TransactionCreateTransactionParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayTransactionDto, any>({
+        path: `/CreateTransaction`,
+        method: "POST",
         query: query,
         secure: true,
         format: "json",
