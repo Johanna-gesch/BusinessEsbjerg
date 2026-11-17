@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Infra.Entities;
 using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Repositories.Interfaces;
+using Service.DTOs.HolidayDTOs;
 
 namespace Service.HolidayServices.Earnings;
 
@@ -59,6 +60,7 @@ public class EarningService(
             earningsToSave.Add(new HolidayEarning
             {
                 Id = Guid.NewGuid(),
+                UserId = userId,
                 HolidayAccountId = week1_5.Id,
                 EarnedDate = monthStart,
                 EarnedDays = result.Week1_5Days,
@@ -73,6 +75,7 @@ public class EarningService(
             earningsToSave.Add(new HolidayEarning
             {
                 Id = Guid.NewGuid(),
+                UserId = userId,
                 HolidayAccountId = week6.Id,
                 EarnedDate = monthStart,
                 EarnedDays = result.Week6Days,
@@ -143,7 +146,53 @@ public class EarningService(
             }
         }
     }
+    
+    public async Task<UserEarningsDto> GetEarningsByUser(string userId)
+    {
+        var accounts = await accountRepo.GetUserAccountsAsync(userId);
 
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        var result = new UserEarningsDto();
+
+        foreach (var account in accounts)
+        {
+            var earnings = await earningRepo.GetEarningsByUserAndAccount(
+                userId,
+                account.Id
+            );
+
+            var availableEarnings = earnings.Where(e =>
+                e.EarnedDate <= today &&
+                e.ExpiryDate >= today
+            );
+
+            if (account.Type == HolidayType.Week1_5)
+            {
+                result.AvailableWeek1_5Days = availableEarnings.Sum(e => e.EarnedDays);
+                result.AvailableWeek1_5Hours = availableEarnings.Sum(e => e.EarnedHours);
+            }
+            else if (account.Type == HolidayType.Week6)
+            {
+                var availableFrom = new DateOnly(
+                    account.Type == HolidayType.Week6 ? today.Year - 1 : today.Year,
+                    5,
+                    1
+                );
+
+                // Week6-optjening er først tilgængelig
+                // fra 1. maj året efter optjeningsåret.
+                availableEarnings = availableEarnings.Where(e =>
+                    today >= new DateOnly(e.EarnedDate.Year + 1, 5, 1)
+                );
+
+                result.AvailableWeek6Days = availableEarnings.Sum(e => e.EarnedDays);
+                result.AvailableWeek6Hours = availableEarnings.Sum(e => e.EarnedHours);
+            }
+        }
+
+        return result;
+    }
 
     private DateOnly CalculateWeek1_5ExpiryDate(DateOnly earnedDate)
     {

@@ -8,6 +8,7 @@ using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Entities.HolidayTracking.WorkSchedule;
 using Infra.Entities.Users;
 using LinqToDB;
+using Microsoft.AspNetCore.Identity;
 using Service.Security;
 
 namespace API;
@@ -48,6 +49,34 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
                     IsActive = true
                 });
             }
+        
+        var users = dc.Users.ToList();
+        
+        foreach (var user in users)
+        {
+            EnsureHolidayAccounts(user.UserId);
+        }
+
+        if (dc.WorkScheduleHistories.Count() == 0)
+        {
+            // Hent alle brugere færdigt, inden vi begynder at indsætte.
+            
+            foreach (var user in users)
+            {
+                dc.Insert(new WorkScheduleHistory
+                {
+                    Id = Guid.NewGuid(),
+                    EffectiveFrom = new DateOnly(2026, 09, 05),
+                    UserId = $"{user.UserId}",
+                    MondayHours = 7.5m,
+                    TuesdayHours = 7.5m,
+                    WednesdayHours = 7.5m,
+                    ThursdayHours = 7.5m,
+                    FridayHours = 7
+                });
+            }
+        }
+            
     }
 
     public void SeedForTests()
@@ -67,6 +96,33 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
                 PasswordHash = hasher.HashAndSaltPassword(password),
                 Role = 0,
                 IsActive = true
+            });
+        }
+    }
+    
+    private void EnsureHolidayAccounts(string userId)
+    {
+        var existingAccounts = dc.HolidayAccounts
+            .Where(a => a.UserId == userId)
+            .ToList();
+
+        if (!existingAccounts.Any(a => a.Type == HolidayType.Week1_5))
+        {
+            dc.Insert(new HolidayAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Type = HolidayType.Week1_5
+            });
+        }
+
+        if (!existingAccounts.Any(a => a.Type == HolidayType.Week6))
+        {
+            dc.Insert(new HolidayAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Type = HolidayType.Week6
             });
         }
     }

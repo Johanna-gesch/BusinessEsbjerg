@@ -32,13 +32,17 @@ public class EarningRepo(MyDatabaseConnection dc) : IEarningRepo
         }
     }
 
-    public async Task<List<HolidayEarning>> GetEarningsByAccount(Guid accountId)
+    public async Task<List<HolidayEarning>> GetEarningsByUserAndAccount(
+        string userId,
+        Guid accountId)
     {
         return await dc.HolidayEarnings
-            .Where(e => e.HolidayAccountId == accountId)
+            .Where(e =>
+                e.UserId == userId &&
+                e.HolidayAccountId == accountId)
             .ToListAsync();
     }
-    
+
     public async Task<bool> EarningsExist(Guid accountId, DateOnly earnedDate)
     {
         return await dc.HolidayEarnings
