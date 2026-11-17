@@ -3,6 +3,7 @@ import {useState} from "react";
 import {LogOutButton} from "@/Components/LogOutButtn.tsx";
 import {UserRole} from "@/api/Api.ts";
 import type {LoggedInUser} from "@/Interfaces/LoggedInUser.tsx";
+import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkScheduleCard.tsx";
 
 export function Dashboard() {
 
@@ -29,6 +30,7 @@ export function Dashboard() {
                     </button>
                 )}
             </header>
+            <WorkScheduleCard userId={user.userId}/>
         </div>
     )
 }

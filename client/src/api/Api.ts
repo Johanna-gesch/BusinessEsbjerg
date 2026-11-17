@@ -141,6 +141,21 @@ export interface LoginRequestDTO {
   password: string;
 }
 
+export interface WorkScheduleDto {
+  /** @format date */
+  effectiveFrom: string;
+  /** @format decimal */
+  monday: number;
+  /** @format decimal */
+  tuesday: number;
+  /** @format decimal */
+  wednesday: number;
+  /** @format decimal */
+  thursday: number;
+  /** @format decimal */
+  friday: number;
+}
+
 export interface AccountGetAccountByIdParams {
   /** @format guid */
   id?: string;
@@ -156,6 +171,12 @@ export interface UserGetUserByIdParams {
 
 export interface UserDeleteUserParams {
   userId?: string;
+}
+
+export interface WorkScheduleGetEffectiveWorkScheduleParams {
+  userId?: string;
+  /** @format date */
+  date?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -603,6 +624,28 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  getEffectiveWorkSchedule = {
+    /**
+     * No description
+     *
+     * @tags WorkSchedule
+     * @name WorkScheduleGetEffectiveWorkSchedule
+     * @request GET:/GetEffectiveWorkSchedule
+     * @secure
+     */
+    workScheduleGetEffectiveWorkSchedule: (
+      query: WorkScheduleGetEffectiveWorkScheduleParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkScheduleDto, any>({
+        path: `/GetEffectiveWorkSchedule`,
+        method: "GET",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

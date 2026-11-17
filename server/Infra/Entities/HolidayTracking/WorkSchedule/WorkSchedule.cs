@@ -7,7 +7,7 @@ public class WorkSchedule
 {
     [PrimaryKey] public Guid Id { get; set; }
     [Column] public string UserId { get; set; } = "";
-    
+    [Column] public DateOnly EffectiveFrom { get; set; }
     [Column] public decimal MondayHours { get; set; }
     [Column] public decimal TuesdayHours { get; set; }
     [Column] public decimal WednesdayHours { get; set; }
