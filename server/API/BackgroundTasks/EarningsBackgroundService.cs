@@ -2,6 +2,9 @@
 
 namespace API.BackgroundTasks;
 
+/**
+ * Automatically runs monthly earnings
+ */
 public class EarningsBackgroundService(
     IServiceScopeFactory scopeFactory,
     ILogger<EarningsBackgroundService> logger
@@ -10,6 +13,7 @@ public class EarningsBackgroundService(
     protected override async Task ExecuteAsync(
         CancellationToken stoppingToken)
     {
+        // Keep running until the application is shutting down
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -42,6 +46,7 @@ public class EarningsBackgroundService(
 
             try
             {
+                // Wait one day before the next execution.
                 await Task.Delay(
                     TimeSpan.FromDays(1),
                     stoppingToken
