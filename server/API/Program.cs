@@ -1,4 +1,5 @@
 using API;
+using API.BackgroundTasks;
 using Infra;
 using LinqToDB;
 using LinqToDB.AspNet;
@@ -20,6 +21,8 @@ builder.Services.ConfigureDomainServices(
 
 builder.Services.AddScoped<MySeeder>();
 builder.Services.AddExceptionHandler<ProblemExceptionHandler>();
+
+builder.Services.AddHostedService<EarningsBackgroundService>();
 
 builder.Services.AddControllers();
 
