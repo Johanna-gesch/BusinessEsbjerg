@@ -30,10 +30,10 @@ public class EarningCalculator
 
         var periods = GetSchedulePeriods(schedules, monthStart, monthEnd);
 
-        var totalWorkDays = periods.Sum(p =>
+        var totalWorkDaysPrMonth = periods.Sum(p =>
             CountMonthlyWorkDays(p.Schedule, p.StartDate, p.EndDate));
 
-        if (totalWorkDays == 0)
+        if (totalWorkDaysPrMonth == 0)
         {
             return new MonthlyEarningResult(0, 0, 0, 0);
         }
@@ -45,16 +45,16 @@ public class EarningCalculator
 
         foreach (var period in periods)
         {
-            int workDays = CountMonthlyWorkDays(
+            int workDaysPrPeriod = CountMonthlyWorkDays(
                 period.Schedule,
                 period.StartDate,
                 period.EndDate
             );
 
-            if (workDays == 0)
+            if (workDaysPrPeriod == 0)
                 continue;
 
-            decimal shareOfMonth = (decimal)workDays / totalWorkDays;
+            decimal shareOfMonth = (decimal)workDaysPrPeriod / totalWorkDaysPrMonth;
 
             decimal weeklyHours = CalculateWeeklyHours(period.Schedule);
             decimal averageDailyHours = weeklyHours / CountWeeklyWorkDays(period.Schedule);
@@ -64,7 +64,7 @@ public class EarningCalculator
 
             decimal earnedWeek1_5Hours =
                 earnedWeek1_5Days * averageDailyHours;
-
+            
             decimal earnedWeek6Hours =
                 3.083m * (weeklyHours / 37m) * shareOfMonth;
 

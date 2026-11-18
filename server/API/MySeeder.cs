@@ -1,4 +1,5 @@
 ﻿using Infra;
+using Infra.Entities;
 using Infra.Entities.HolidayTracking;
 using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Entities.HolidayTracking.Earnings;
