@@ -5,6 +5,7 @@ using Service.HolidayServices;
 
 namespace API.Controllers;
 
+[ApiController]
 public class WorkScheduleController (WorkScheduleService service) : ControllerBase
 {
 
@@ -14,6 +15,13 @@ public class WorkScheduleController (WorkScheduleService service) : ControllerBa
     {
         var schedule = await service.GetEffective(userId, date);
         return Ok(schedule);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost(nameof(CreateWorkSchedule))]
+    public async Task<ActionResult<WorkScheduleDto>> CreateWorkSchedule([FromBody] CreateWorkScheduleDto dto)
+    {
+        return Ok(await service.Create(dto));
     }
     
 }

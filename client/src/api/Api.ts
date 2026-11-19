@@ -88,6 +88,34 @@ export interface CreateCalendarDayDTO {
   name: string;
 }
 
+export interface HolidayTransactionDto {
+  /** @format guid */
+  id: string;
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format guid */
+  holidayEarningId?: string | null;
+  /** @format decimal */
+  amountHours: number;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+}
+
+export interface CreateHolidayTransactionDto {
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format guid */
+  holidayEarningId?: string | null;
+  /** @format decimal */
+  amountHours: number;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+}
+
 export interface CreateUserDto {
   username: string;
   password: string;
@@ -156,6 +184,22 @@ export interface WorkScheduleDto {
   friday: number;
 }
 
+export interface CreateWorkScheduleDto {
+  userId: string;
+  /** @format date */
+  effectiveFrom: string;
+  /** @format decimal */
+  monday: number;
+  /** @format decimal */
+  tuesday: number;
+  /** @format decimal */
+  wednesday: number;
+  /** @format decimal */
+  thursday: number;
+  /** @format decimal */
+  friday: number;
+}
+
 export interface AccountGetAccountByIdParams {
   /** @format guid */
   id?: string;
@@ -163,6 +207,11 @@ export interface AccountGetAccountByIdParams {
 
 export interface AccountGetAccountsForUserParams {
   userId?: string;
+}
+
+export interface TransactionGetTransactionHistoryParams {
+  /** @format guid */
+  accountId?: string;
 }
 
 export interface UserGetUserByIdParams {
@@ -509,6 +558,51 @@ export class Api<
         ...params,
       }),
   };
+  getTransactionHistory = {
+    /**
+     * No description
+     *
+     * @tags Transaction
+     * @name TransactionGetTransactionHistory
+     * @request GET:/GetTransactionHistory
+     * @secure
+     */
+    transactionGetTransactionHistory: (
+      query: TransactionGetTransactionHistoryParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayTransactionDto[], any>({
+        path: `/GetTransactionHistory`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createTransaction = {
+    /**
+     * No description
+     *
+     * @tags Transaction
+     * @name TransactionCreateTransaction
+     * @request POST:/CreateTransaction
+     * @secure
+     */
+    transactionCreateTransaction: (
+      data: CreateHolidayTransactionDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<HolidayTransactionDto, any>({
+        path: `/CreateTransaction`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
   createUser = {
     /**
      * No description
@@ -646,6 +740,29 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createWorkSchedule = {
+    /**
+     * No description
+     *
+     * @tags WorkSchedule
+     * @name WorkScheduleCreateWorkSchedule
+     * @request POST:/CreateWorkSchedule
+     * @secure
+     */
+    workScheduleCreateWorkSchedule: (
+      data: CreateWorkScheduleDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkScheduleDto, any>({
+        path: `/CreateWorkSchedule`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

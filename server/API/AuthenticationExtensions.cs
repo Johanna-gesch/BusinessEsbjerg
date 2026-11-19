@@ -8,6 +8,7 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using Service;
 using Service.HolidayServices;
+using Service.HolidayServices.Earnings;
 using Service.Security;
 
 
@@ -33,6 +34,13 @@ public static class AuthenticationExtensions
         
         services.AddScoped<AccountService>();
         services.AddScoped<IAccountRepo, AccountRepo>();
+        
+        services.AddScoped<EarningService>();
+        services.AddScoped<EarningCalculator>();
+        services.AddScoped<IEarningRepo, EarningRepo>();
+      
+        services.AddScoped<TransactionService>();
+        services.AddScoped<ITransactionRepo, TransactionRepo>();
         
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
