@@ -103,6 +103,19 @@ export interface HolidayTransactionDto {
   description?: string | null;
 }
 
+export interface CreateHolidayTransactionDto {
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format guid */
+  holidayEarningId?: string | null;
+  /** @format decimal */
+  amountHours: number;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+}
+
 export interface CreateUserDto {
   username: string;
   password: string;
@@ -171,6 +184,22 @@ export interface WorkScheduleDto {
   friday: number;
 }
 
+export interface CreateWorkScheduleDto {
+  userId: string;
+  /** @format date */
+  effectiveFrom: string;
+  /** @format decimal */
+  monday: number;
+  /** @format decimal */
+  tuesday: number;
+  /** @format decimal */
+  wednesday: number;
+  /** @format decimal */
+  thursday: number;
+  /** @format decimal */
+  friday: number;
+}
+
 export interface AccountGetAccountByIdParams {
   /** @format guid */
   id?: string;
@@ -183,19 +212,6 @@ export interface AccountGetAccountsForUserParams {
 export interface TransactionGetTransactionHistoryParams {
   /** @format guid */
   accountId?: string;
-}
-
-export interface TransactionCreateTransactionParams {
-  /** @format guid */
-  HolidayAccountId?: string;
-  /** @format guid */
-  HolidayEarningId?: string | null;
-  /** @format decimal */
-  AmountHours?: number;
-  /** @format date */
-  TransactionDate?: string;
-  TransactionType?: HolidayTransactionType;
-  Description?: string | null;
 }
 
 export interface UserGetUserByIdParams {
@@ -574,14 +590,15 @@ export class Api<
      * @secure
      */
     transactionCreateTransaction: (
-      query: TransactionCreateTransactionParams = {},
+      data: CreateHolidayTransactionDto,
       params: RequestParams = {},
     ) =>
       this.request<HolidayTransactionDto, any>({
         path: `/CreateTransaction`,
         method: "POST",
-        query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -723,6 +740,29 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createWorkSchedule = {
+    /**
+     * No description
+     *
+     * @tags WorkSchedule
+     * @name WorkScheduleCreateWorkSchedule
+     * @request POST:/CreateWorkSchedule
+     * @secure
+     */
+    workScheduleCreateWorkSchedule: (
+      data: CreateWorkScheduleDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkScheduleDto, any>({
+        path: `/CreateWorkSchedule`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
