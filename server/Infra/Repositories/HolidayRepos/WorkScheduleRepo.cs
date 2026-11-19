@@ -32,4 +32,9 @@ public class WorkScheduleRepo(MyDatabaseConnection dc) : IWorkScheduleRepo
             .OrderByDescending(h => h.EffectiveFrom)
             .ToListAsync();
     }
+
+    public async Task Insert(WorkScheduleHistory schedule)
+    {
+        await dc.InsertAsync(schedule);
+    }
 }

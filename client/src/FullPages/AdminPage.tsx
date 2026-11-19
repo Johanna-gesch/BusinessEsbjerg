@@ -4,6 +4,7 @@ import type {User} from "@/api/Api.ts";
 import apiClient from "@/services/ApiClient.ts";
 import {UserList} from "@/Components/UserList.tsx";
 import {CreateUserForm} from "@/Components/CreateUserForm.tsx";
+import {CreateWorkScheduleForm} from "@/Components/WorkScheduleComponents/CreateWorkScheduleForm.tsx";
 
 const MyApi = apiClient.api;
 
@@ -33,6 +34,7 @@ export function AdminPage() {
 
             <UserList users={users} setUsers={setUsers} />
             <CreateUserForm setUsers={setUsers} />
+            <CreateWorkScheduleForm users={users} />
         </div>
     );
 }
