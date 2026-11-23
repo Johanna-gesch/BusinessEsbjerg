@@ -17,6 +17,8 @@ public class UserServiceTests
     private readonly AccountRepoStub _accountRepoStub = new();
     private readonly IPasswordHasher _hasher = new Argon2PasswordHasher();
 
+    private User? _createdUser;
+
     public UserServiceTests()
     {
         var accountService = new AccountService(_accountRepoStub);
@@ -41,10 +43,12 @@ public class UserServiceTests
         //Act
         await _service.Insert(dto);
         
-        //Assert
         var users = await _userRepo.GetAll();
+        var user = Assert.Single(users); //Only 1 user created
+
+        _createdUser = user;
         
-        Assert.Single(users); //Only 1 user created
+        //Assert
         Assert.Equal("TestUser", users.First().Username);
         Assert.False(users.First().Role == UserRole.Admin);
         Assert.False(string.IsNullOrWhiteSpace(users.First().UserId));
@@ -102,6 +106,7 @@ public class UserServiceTests
 
         // Assert
         var user = Assert.Single(await _userRepo.GetAll());
+        _createdUser = user;
 
         Assert.Equal(2, _accountRepoStub.Accounts.Count);
 
@@ -196,6 +201,8 @@ public class UserServiceTests
         };
         
         await _userRepo.Insert(user);
+
+        _createdUser = user;
         
         // Act
         var result = await _service.GetById("123");
@@ -236,6 +243,8 @@ public class UserServiceTests
         
         await _userRepo.Insert(user);
 
+        _createdUser = user;
+
         var dto = new UpdateUserDto
         {
             UserId = "123",
@@ -252,6 +261,5 @@ public class UserServiceTests
         Assert.Equal("NewUsername", result.Username);
     }
     #endregion
-    
     
 }
