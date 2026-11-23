@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.ExceptionServices;
 using Infra.Entities;
 using Infra.Entities.Users;
 
@@ -65,30 +66,42 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task CreateUser_WithValidData_CreatesUser()
     {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
+        User? createdUser = null;
         
-        var username = $"testuser_{Guid.NewGuid()}";
+        try
+        {
+            // Arrange
+            await _helpers.AuthorizeAsAdmin();
 
-        // Act
-        var response = await _client.PostAsJsonAsync(
-            "/CreateUser",
-            new
-            {
-                Username = username,
-                Password = "test123",
-                Role = UserRole.User
-            }
-        );
+            var username = $"testuser_{Guid.NewGuid()}";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            // Act
+            var response = await _client.PostAsJsonAsync(
+                "/CreateUser",
+                new
+                {
+                    Username = username,
+                    Password = "test123",
+                    Role = UserRole.User
+                }
+            );
 
-        // Check that the user was actually saved
-        var users = await _client.GetFromJsonAsync<List<User>>("/GetUsers");
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.NotNull(users);
-        Assert.Contains(users, user => user.Username == username);
+            // Check that the user was actually saved
+            var users = await _client.GetFromJsonAsync<List<User>>("/GetUsers");
+
+            Assert.NotNull(users);
+            Assert.Contains(users, user => user.Username == username);
+            createdUser = users.FirstOrDefault(user => user.Username == username);
+        }
+        finally
+        {
+            //Cleanup
+            if (createdUser != null) 
+                await _helpers.RemoveUserWithAccounts(createdUser.UserId);
+        }
     }
     #endregion
 
@@ -112,38 +125,51 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetUserById_WithExistingId_ReturnsUser()
     {
-        // Arrange
+        User? createdUser = null;
+
+        try
+        {
+            // Arrange
+
+            await _helpers.AuthorizeAsAdmin();
+
+            var username = $"testuser_{Guid.NewGuid()}";
+
+            await _client.PostAsJsonAsync(
+                "/CreateUser",
+                new
+                {
+                    Username = username,
+                    Password = "test123",
+                    Role = UserRole.User
+                }
+            );
+
+            var users = await _client.GetFromJsonAsync<List<User>>("/GetUsers");
+
+            // ! is to tell the compiler that users are not null
+            createdUser = users!.First(user => user.Username == username);
+
+            // Act
+            var response = await _client.GetAsync(
+                $"/GetUserById?id={createdUser.UserId}"
+            );
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var user = await response.Content.ReadFromJsonAsync<User>();
+
+            Assert.NotNull(user);
+            Assert.Equal(username, user.Username);
+        }
+        finally
+        {
+            //Cleanup
+            if (createdUser != null) 
+                await _helpers.RemoveUserWithAccounts(createdUser.UserId);
+        }
         
-        await _helpers.AuthorizeAsAdmin();
-        
-        var username = $"testuser_{Guid.NewGuid()}";
-
-        await _client.PostAsJsonAsync(
-            "/CreateUser",
-            new
-            {
-                Username = username,
-                Password = "test123",
-                Role = UserRole.User
-            }
-        );
-
-        var users = await _client.GetFromJsonAsync<List<User>>("/GetUsers");
-
-        var createdUser = users!.First(user => user.Username == username);
-
-        // Act
-        var response = await _client.GetAsync(
-            $"/GetUserById?id={createdUser.UserId}"
-        );
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var user = await response.Content.ReadFromJsonAsync<User>();
-
-        Assert.NotNull(user);
-        Assert.Equal(username, user.Username);
     }
 
     [Fact]
@@ -164,46 +190,59 @@ public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task UpdateUser_WithValidData_UpdatesUsername()
     {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
+        User? createdUser = null;
+
+        try
+        {
+            // Arrange
+            await _helpers.AuthorizeAsAdmin();
+
+            var username = $"testuser_{Guid.NewGuid()}";
+
+            await _client.PostAsJsonAsync(
+                "/CreateUser",
+                new
+                {
+                    Username = username,
+                    Password = "test123",
+                    Role = UserRole.User
+                }
+            );
+
+            var users = await _client.GetFromJsonAsync<List<User>>("/GetUsers");
+
+            createdUser = users!.First(user => user.Username == username);
+
+            var updatedUsername = $"updated_{Guid.NewGuid()}";
+
+            // Act
+            var response = await _client.PutAsJsonAsync(
+                "/UpdateUser",
+                new
+                {
+                    UserId = createdUser.UserId,
+                    Username = updatedUsername
+                }
+            );
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var updatedUser = await _client.GetFromJsonAsync<User>(
+                $"/GetUserById?id={createdUser.UserId}"
+            );
+
+            Assert.NotNull(updatedUser);
+            Assert.Equal(updatedUsername, updatedUser.Username);
+        }
+        finally
+        {
+            //Cleanup
+            if (createdUser != null) 
+                await _helpers.RemoveUserWithAccounts(createdUser.UserId);
+        }
         
-        var username = $"testuser_{Guid.NewGuid()}";
-
-        await _client.PostAsJsonAsync(
-            "/CreateUser",
-            new
-            {
-                Username = username,
-                Password = "test123",
-                Role = UserRole.User
-            }
-        );
-
-        var users = await _client.GetFromJsonAsync<List<User>>("/GetUsers");
-
-        var createdUser = users!.First(user => user.Username == username);
-
-        var updatedUsername = $"updated_{Guid.NewGuid()}";
-
-        // Act
-        var response = await _client.PutAsJsonAsync(
-            "/UpdateUser",
-            new
-            {
-                UserId = createdUser.UserId,
-                Username = updatedUsername
-            }
-        );
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var updatedUser = await _client.GetFromJsonAsync<User>(
-            $"/GetUserById?id={createdUser.UserId}"
-        );
-
-        Assert.NotNull(updatedUser);
-        Assert.Equal(updatedUsername, updatedUser.Username);
+        
     }
     #endregion
     

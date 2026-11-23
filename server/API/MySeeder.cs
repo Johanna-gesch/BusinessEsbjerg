@@ -85,8 +85,7 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
 
         const string username = "playwright_admin";
         const string password = "PlaywrightPassword123";
-
-        // Idempotence: Only create the user if it doesn't already exist.
+        
         if (!dc.Users.Any(u => u.Username == username))
         {
             dc.Insert(new User

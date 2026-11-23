@@ -112,6 +112,7 @@ public class EarningService(
 
         foreach (var user in users)
         {
+            
             cancellationToken.ThrowIfCancellationRequested();
 
             var schedules = await workScheduleRepo.GetHistoryForUser(
@@ -132,6 +133,7 @@ public class EarningService(
 
             while (monthStart <= lastCompletedMonth)
             {
+                
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var monthEnd = monthStart.AddMonths(1).AddDays(-1);

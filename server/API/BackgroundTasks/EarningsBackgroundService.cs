@@ -23,6 +23,10 @@ public class EarningsBackgroundService(
                 var earningService = scope.ServiceProvider
                     .GetRequiredService<EarningService>();
 
+                logger.LogInformation("Starting monthly earnings processing.");
+
+                await earningService.ProcessMonthlyEarnings(stoppingToken);
+                
                 await earningService.ProcessMonthlyEarnings(
                     stoppingToken
                 );
