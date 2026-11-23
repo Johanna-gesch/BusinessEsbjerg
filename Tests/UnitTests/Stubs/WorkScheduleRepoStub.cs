@@ -34,4 +34,9 @@ public class WorkScheduleRepoStub : IWorkScheduleRepo
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<WorkScheduleHistory>> GetAllHistoryUpTo(DateOnly end)
+    {
+        throw new NotImplementedException();
+    }
 }
