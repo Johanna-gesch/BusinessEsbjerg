@@ -10,7 +10,7 @@ public class HolidayRequest
 {
     [PrimaryKey] public Guid Id { get; set; }
     [Column] public string UserId { get; set; } = "";
-    [Column] public Guid HolidayAccountId { get; set; }
+    //[Column] public Guid HolidayAccountId { get; set; }
     
     [Column] public DateTime CreatedAt { get; set; }
     [Column] public string? CancellationReason { get; set; }
@@ -27,6 +27,6 @@ public class HolidayRequest
     [Association(ThisKey = nameof(UserId), OtherKey = nameof(User.UserId))]
     public User User { get; set; } = null!;
 
-    [Association(ThisKey = nameof(HolidayAccountId), OtherKey = nameof(HolidayAccount.Id))]
-    public HolidayAccount HolidayAccount { get; set; } = null!;
+    //[Association(ThisKey = nameof(HolidayAccountId), OtherKey = nameof(HolidayAccount.Id))]
+    //public HolidayAccount HolidayAccount { get; set; } = null!;
 }
