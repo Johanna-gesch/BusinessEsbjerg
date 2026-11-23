@@ -5,6 +5,7 @@ using Service.HolidayServices;
 
 namespace API.Controllers;
 
+[ApiController]
 public class TransactionController (TransactionService service) : ControllerBase
 {
     [Authorize]
@@ -16,7 +17,7 @@ public class TransactionController (TransactionService service) : ControllerBase
 
     [Authorize(Policy = "Admin")]
     [HttpPost(nameof(CreateTransaction))]
-    public async Task<ActionResult<HolidayTransactionDto>> CreateTransaction(CreateHolidayTransactionDto dto)
+    public async Task<ActionResult<HolidayTransactionDto>> CreateTransaction([FromBody]CreateHolidayTransactionDto dto)
     {
         return Ok(await service.Create(dto));
     }

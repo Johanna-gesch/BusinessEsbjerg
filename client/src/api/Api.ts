@@ -23,6 +23,13 @@ export enum UserRole {
   Accountant = 2,
 }
 
+export enum SharedCalendarDayStatus {
+  Off = 0,
+  Working = 1,
+  Holiday = 2,
+  PublicHoliday = 3,
+}
+
 export enum HolidayTransactionType {
   Earned = 0,
   Used = 1,
@@ -51,10 +58,13 @@ export interface HolidayEarning {
   id: string;
   /** @format guid */
   holidayAccountId: string;
+  userId: string;
   /** @format date */
   earnedDate: string;
   /** @format decimal */
   earnedHours: number;
+  /** @format decimal */
+  earnedDays: number;
   /** @format date */
   expiryDate: string;
 }
@@ -88,9 +98,45 @@ export interface CreateCalendarDayDTO {
   name: string;
 }
 
+export interface UserEarningsDto {
+  /** @format decimal */
+  availableWeek1_5Days: number;
+  /** @format decimal */
+  availableWeek6Days: number;
+  /** @format decimal */
+  availableWeek1_5Hours: number;
+  /** @format decimal */
+  availableWeek6Hours: number;
+}
+
+export interface SharedCalendarEmployeeDto {
+  userId: string;
+  username: string;
+  days: SharedCalendarDayDto[];
+}
+
+export interface SharedCalendarDayDto {
+  /** @format date */
+  date: string;
+  status: SharedCalendarDayStatus;
+}
+
 export interface HolidayTransactionDto {
   /** @format guid */
   id: string;
+  /** @format guid */
+  holidayAccountId: string;
+  /** @format guid */
+  holidayEarningId?: string | null;
+  /** @format decimal */
+  amountHours: number;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+}
+
+export interface CreateHolidayTransactionDto {
   /** @format guid */
   holidayAccountId: string;
   /** @format guid */
@@ -171,6 +217,22 @@ export interface WorkScheduleDto {
   friday: number;
 }
 
+export interface CreateWorkScheduleDto {
+  userId: string;
+  /** @format date */
+  effectiveFrom: string;
+  /** @format decimal */
+  monday: number;
+  /** @format decimal */
+  tuesday: number;
+  /** @format decimal */
+  wednesday: number;
+  /** @format decimal */
+  thursday: number;
+  /** @format decimal */
+  friday: number;
+}
+
 export interface AccountGetAccountByIdParams {
   /** @format guid */
   id?: string;
@@ -180,22 +242,20 @@ export interface AccountGetAccountsForUserParams {
   userId?: string;
 }
 
+export interface EarningGetEarningsForUserParams {
+  userId?: string;
+}
+
+export interface SharedCalendarGetSharedCalendarParams {
+  /** @format date */
+  start?: string;
+  /** @format date */
+  end?: string;
+}
+
 export interface TransactionGetTransactionHistoryParams {
   /** @format guid */
   accountId?: string;
-}
-
-export interface TransactionCreateTransactionParams {
-  /** @format guid */
-  HolidayAccountId?: string;
-  /** @format guid */
-  HolidayEarningId?: string | null;
-  /** @format decimal */
-  AmountHours?: number;
-  /** @format date */
-  TransactionDate?: string;
-  TransactionType?: HolidayTransactionType;
-  Description?: string | null;
 }
 
 export interface UserGetUserByIdParams {
@@ -542,6 +602,50 @@ export class Api<
         ...params,
       }),
   };
+  getEarningsForUser = {
+    /**
+     * No description
+     *
+     * @tags Earning
+     * @name EarningGetEarningsForUser
+     * @request GET:/GetEarningsForUser
+     * @secure
+     */
+    earningGetEarningsForUser: (
+      query: EarningGetEarningsForUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<UserEarningsDto, any>({
+        path: `/GetEarningsForUser`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getSharedCalendar = {
+    /**
+     * No description
+     *
+     * @tags SharedCalendar
+     * @name SharedCalendarGetSharedCalendar
+     * @request GET:/GetSharedCalendar
+     * @secure
+     */
+    sharedCalendarGetSharedCalendar: (
+      query: SharedCalendarGetSharedCalendarParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<SharedCalendarEmployeeDto[], any>({
+        path: `/GetSharedCalendar`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
   getTransactionHistory = {
     /**
      * No description
@@ -574,14 +678,15 @@ export class Api<
      * @secure
      */
     transactionCreateTransaction: (
-      query: TransactionCreateTransactionParams = {},
+      data: CreateHolidayTransactionDto,
       params: RequestParams = {},
     ) =>
       this.request<HolidayTransactionDto, any>({
         path: `/CreateTransaction`,
         method: "POST",
-        query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -723,6 +828,29 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createWorkSchedule = {
+    /**
+     * No description
+     *
+     * @tags WorkSchedule
+     * @name WorkScheduleCreateWorkSchedule
+     * @request POST:/CreateWorkSchedule
+     * @secure
+     */
+    workScheduleCreateWorkSchedule: (
+      data: CreateWorkScheduleDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkScheduleDto, any>({
+        path: `/CreateWorkSchedule`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

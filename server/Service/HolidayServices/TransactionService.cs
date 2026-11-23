@@ -70,9 +70,10 @@ public class TransactionService(
             Description = dto.Description
         };
         
-        // Return a DTO instead of exposing the database entity to the caller.
         await transactionRepo.Insert(entity);
-        return ToDto(entity);
+        
+        // Return a DTO instead of exposing the database entity to the caller.
+        return ToDto (entity);
     }
 
     // Converts a database entity into the response DTO.

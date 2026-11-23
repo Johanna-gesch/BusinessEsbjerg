@@ -29,4 +29,14 @@ public class WorkScheduleRepoStub : IWorkScheduleRepo
             .OrderByDescending(h => h.EffectiveFrom)
             .ToList());
     }
+
+    public Task Insert(WorkScheduleHistory schedule)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<WorkScheduleHistory>> GetAllHistoryUpTo(DateOnly end)
+    {
+        throw new NotImplementedException();
+    }
 }
