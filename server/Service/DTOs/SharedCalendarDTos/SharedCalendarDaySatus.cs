@@ -4,6 +4,7 @@ public enum SharedCalendarDayStatus
 {
     Off,
     Working,
-    Holiday
+    Holiday,
+    PublicHoliday,
     
 }

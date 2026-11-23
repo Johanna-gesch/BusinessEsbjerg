@@ -63,6 +63,10 @@ export function Dashboard() {
                         Admin
                     </button>
                 )}
+
+                <button onClick={()=> navigate("/sharedcalendar")}>
+                    Shared Calendar
+                </button>
             </header>
 
             <WorkScheduleCard userId={user.userId} />

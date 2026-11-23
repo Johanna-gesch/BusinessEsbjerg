@@ -11,6 +11,7 @@ import {createBrowserRouter, Route, RouterProvider} from "react-router-dom"
 import {AdminPage} from "@/FullPages/AdminPage.tsx";
 import LoginPage from "@/FullPages/LoginPage.tsx";
 import {Dashboard} from "@/FullPages/Dashboard.tsx";
+import {CalendarPage} from "@/FullPages/CalendarPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +22,9 @@ const router = createBrowserRouter([
     },
     {
         path: "/dashboard", element: <Dashboard />
+    },
+    {
+        path: "/sharedcalendar", element: <CalendarPage/>
     }
 ]);
 

@@ -37,4 +37,11 @@ public class WorkScheduleRepo(MyDatabaseConnection dc) : IWorkScheduleRepo
     {
         await dc.InsertAsync(schedule);
     }
+    
+    public async Task<List<WorkScheduleHistory>> GetAllHistoryUpTo(DateOnly end)
+    {
+        return await dc.GetTable<WorkScheduleHistory>()
+            .Where(h => h.EffectiveFrom <= end)
+            .ToListAsync();
+    }
 }

@@ -9,4 +9,6 @@ public interface IWorkScheduleRepo
     Task<List<WorkScheduleHistory>> GetHistoryForUser(string userId);
 
     Task Insert(WorkScheduleHistory schedule);
+    
+    Task<List<WorkScheduleHistory>> GetAllHistoryUpTo(DateOnly end);
 }
