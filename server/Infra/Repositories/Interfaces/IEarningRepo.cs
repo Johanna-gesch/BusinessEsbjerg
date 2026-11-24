@@ -10,5 +10,5 @@ public interface IEarningRepo
     
     Task<bool> EarningsExist(Guid accountId, DateOnly earnedDate);
 
-
+    
 }

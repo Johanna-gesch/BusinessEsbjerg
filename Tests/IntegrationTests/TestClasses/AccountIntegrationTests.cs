@@ -34,26 +34,38 @@ public class AccountIntegrationTests
     [Fact]
     public async Task GetAccountById_WithExistingId_ReturnsAccount()
     {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
+        string? createdUserId = null;
 
-        var (userId, accounts) = await _helpers.CreateUserWithAccounts();
+        try
+        {
+            // Arrange
+            await _helpers.AuthorizeAsAdmin();
 
-        var createdAccount = accounts.Single(
-            a => a.Type == HolidayType.Week1_5);
+            var (userId, accounts) = await _helpers.CreateUserWithAccounts();
 
-        // Act
-        var response = await _client.GetAsync(
-            $"/GetAccountById?id={createdAccount.Id}");
+            createdUserId = userId;
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var createdAccount = accounts.Single(a => a.Type == HolidayType.Week1_5);
 
-        var account = await response.Content.ReadFromJsonAsync<HolidayAccount>();
+            // Act
+            var response = await _client.GetAsync(
+                $"/GetAccountById?id={createdAccount.Id}");
 
-        Assert.NotNull(account);
-        Assert.Equal(createdAccount.Id, account.Id);
-        Assert.Equal(userId, account.UserId);
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var account = await response.Content.ReadFromJsonAsync<HolidayAccount>();
+
+            Assert.NotNull(account);
+            Assert.Equal(createdAccount.Id, account.Id);
+            Assert.Equal(userId, account.UserId);
+        }
+        finally
+        {
+            //Cleanup
+            if (createdUserId != null) 
+                await _helpers.RemoveUserWithAccounts(createdUserId);
+        }
     }
 
     [Fact]
@@ -73,29 +85,44 @@ public class AccountIntegrationTests
     [Fact]
     public async Task GetAccountsForUser_WithExistingAccounts_ReturnsUserAccounts()
     {
-        // Arrange
-        await _helpers.AuthorizeAsAdmin();
 
-        var (userId, _) = await _helpers.CreateUserWithAccounts();
+        string? createdUserId = null;
+        
+        try
+        {
+            // Arrange
+            await _helpers.AuthorizeAsAdmin();
 
-        // Act
-        var response = await _client.GetAsync(
-            $"/GetAccountsForUser?userId={Uri.EscapeDataString(userId)}");
+            var (userId, _) = await _helpers.CreateUserWithAccounts();
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            createdUserId = userId;
 
-        var accounts =
-            await response.Content.ReadFromJsonAsync<List<HolidayAccount>>();
+            // Act
+            var response = await _client.GetAsync(
+                $"/GetAccountsForUser?userId={Uri.EscapeDataString(userId)}");
 
-        Assert.NotNull(accounts);
-        Assert.Equal(2, accounts.Count);
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.Contains(accounts, a => a.Type == HolidayType.Week1_5);
-        Assert.Contains(accounts, a => a.Type == HolidayType.Week6);
+            var accounts =
+                await response.Content.ReadFromJsonAsync<List<HolidayAccount>>();
 
-        Assert.All(accounts, account =>
-            Assert.Equal(userId, account.UserId));
+            Assert.NotNull(accounts);
+            Assert.Equal(2, accounts.Count);
+
+            Assert.Contains(accounts, a => a.Type == HolidayType.Week1_5);
+            Assert.Contains(accounts, a => a.Type == HolidayType.Week6);
+
+            Assert.All(accounts, account =>
+                Assert.Equal(userId, account.UserId));
+        }
+        finally
+        {
+            //Cleanup
+            if (createdUserId != null) 
+                await _helpers.RemoveUserWithAccounts(createdUserId);
+        }
+        
     }
 
     [Fact]
