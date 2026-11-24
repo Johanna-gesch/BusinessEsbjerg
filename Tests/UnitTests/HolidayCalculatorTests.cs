@@ -6,7 +6,7 @@ namespace Tests.UnitTests;
 public class HolidayCalculatorTests
 {
     // Man-Tor 7,5, Fre 7, weekends 0
-    private static decimal Hours(DayOfWeek d) => d switch
+    private static decimal Hours(DateOnly date) => date.DayOfWeek switch
     {
         DayOfWeek.Friday => 7m,
         DayOfWeek.Saturday or DayOfWeek.Sunday => 0m,
@@ -64,6 +64,4 @@ public class HolidayCalculatorTests
 
         Assert.Equal(29.5m, result);
     }
-    
-    
 }
