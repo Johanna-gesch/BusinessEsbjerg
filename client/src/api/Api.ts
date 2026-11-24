@@ -10,11 +10,11 @@
  * ---------------------------------------------------------------
  */
 
-export enum HolidayRequestStatus {
-  Pending = 0,
-  Approved = 1,
-  Rejected = 2,
-  Cancelled = 3,
+export enum SharedCalendarDayStatus {
+  Off = 0,
+  Working = 1,
+  Holiday = 2,
+  PublicHoliday = 3,
 }
 
 export enum UserRole {
@@ -23,11 +23,11 @@ export enum UserRole {
   Accountant = 2,
 }
 
-export enum SharedCalendarDayStatus {
-  Off = 0,
-  Working = 1,
-  Holiday = 2,
-  PublicHoliday = 3,
+export enum HolidayRequestStatus {
+  Pending = 0,
+  Approved = 1,
+  Rejected = 2,
+  Cancelled = 3,
 }
 
 export enum HolidayTransactionType {
@@ -109,6 +109,35 @@ export interface UserEarningsDto {
   availableWeek6Hours: number;
 }
 
+export interface HolidayRequest {
+  /** @format guid */
+  id: string;
+  userId: string;
+  /** @format date-time */
+  createdAt: string;
+  cancellationReason?: string | null;
+  /** @format date */
+  startDate: string;
+  /** @format date */
+  endDate: string;
+  status: HolidayRequestStatus;
+  approvedByUserId?: string | null;
+  /** @format date-time */
+  approvedAt?: string | null;
+  rejectionReason?: string | null;
+  user: User;
+}
+
+export interface User {
+  userId: string;
+  username: string;
+  passwordHash: string;
+  role: UserRole;
+  isActive: boolean;
+  holidayAccounts: HolidayAccount[];
+  holidayRequests: HolidayRequest[];
+}
+
 export interface SharedCalendarEmployeeDto {
   userId: string;
   username: string;
@@ -153,38 +182,6 @@ export interface CreateUserDto {
   username: string;
   password: string;
   role: UserRole;
-}
-
-export interface User {
-  userId: string;
-  username: string;
-  passwordHash: string;
-  role: UserRole;
-  isActive: boolean;
-  holidayAccounts: HolidayAccount[];
-  holidayRequests: HolidayRequest[];
-}
-
-export interface HolidayRequest {
-  /** @format guid */
-  id: string;
-  userId: string;
-  /** @format guid */
-  holidayAccountId: string;
-  /** @format date-time */
-  createdAt: string;
-  cancellationReason?: string | null;
-  /** @format date */
-  startDate: string;
-  /** @format date */
-  endDate: string;
-  status: HolidayRequestStatus;
-  approvedByUserId?: string | null;
-  /** @format date-time */
-  approvedAt?: string | null;
-  rejectionReason?: string | null;
-  user: User;
-  holidayAccount: HolidayAccount;
 }
 
 export interface UpdateUserDto {
@@ -244,6 +241,19 @@ export interface AccountGetAccountsForUserParams {
 
 export interface EarningGetEarningsForUserParams {
   userId?: string;
+}
+
+export interface RequestCreateRequestParams {
+  /** @format date */
+  StartDate?: string;
+  /** @format date */
+  EndDate?: string;
+}
+
+export interface RequestUpdateRequestStatusParams {
+  /** @format guid */
+  requestId?: string;
+  status?: HolidayRequestStatus;
 }
 
 export interface SharedCalendarGetSharedCalendarParams {
@@ -621,6 +631,84 @@ export class Api<
         query: query,
         secure: true,
         format: "json",
+        ...params,
+      }),
+  };
+  getAllRequests = {
+    /**
+     * No description
+     *
+     * @tags Request
+     * @name RequestGetAllRequests
+     * @request GET:/GetAllRequests
+     * @secure
+     */
+    requestGetAllRequests: (params: RequestParams = {}) =>
+      this.request<HolidayRequest[], any>({
+        path: `/GetAllRequests`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getRequestsForUser = {
+    /**
+     * No description
+     *
+     * @tags Request
+     * @name RequestGetRequestsForUser
+     * @request GET:/GetRequestsForUser
+     * @secure
+     */
+    requestGetRequestsForUser: (params: RequestParams = {}) =>
+      this.request<HolidayRequest[], any>({
+        path: `/GetRequestsForUser`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  createRequest = {
+    /**
+     * No description
+     *
+     * @tags Request
+     * @name RequestCreateRequest
+     * @request POST:/CreateRequest
+     * @secure
+     */
+    requestCreateRequest: (
+      query: RequestCreateRequestParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<Blob, any>({
+        path: `/CreateRequest`,
+        method: "POST",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+  };
+  updateRequestStatus = {
+    /**
+     * No description
+     *
+     * @tags Request
+     * @name RequestUpdateRequestStatus
+     * @request PUT:/UpdateRequestStatus
+     * @secure
+     */
+    requestUpdateRequestStatus: (
+      query: RequestUpdateRequestStatusParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<Blob, any>({
+        path: `/UpdateRequestStatus`,
+        method: "PUT",
+        query: query,
+        secure: true,
         ...params,
       }),
   };

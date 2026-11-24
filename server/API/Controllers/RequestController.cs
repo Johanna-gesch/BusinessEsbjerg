@@ -17,14 +17,16 @@ public class RequestController(RequestService requestService) : ControllerBase
     }
 
     [HttpGet(nameof(GetRequestsForUser))]
-    public async Task<List<HolidayRequest>> GetRequestsForUser()
+    public async Task<IActionResult> GetRequestsForUser()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (string.IsNullOrWhiteSpace(userId))
-            throw new UnauthorizedAccessException();
+            return Unauthorized();
 
-        return await requestService.GetRequestsForUser(userId);
+        var requests = await requestService.GetRequestsForUser(userId);
+
+        return Ok(requests);
     }
     
     [HttpPost(nameof(CreateRequest))]
