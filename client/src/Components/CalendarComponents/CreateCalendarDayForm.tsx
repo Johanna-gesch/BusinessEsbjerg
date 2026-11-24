@@ -10,6 +10,7 @@ function getErrorMessage(error: unknown): string {
     return problem?.detail ?? "Could not save public holiday";
     }
 
+/** Form where an admin creates a public holiday, a day nobody works. */
 export function CreateCalendarDayForm(){
     const[date, setDate] = useState("");
     const [name, setName] = useState("");

@@ -10,7 +10,6 @@ public class CalendarDayController (CalendarDayService service) : ControllerBase
 {
     [Authorize(Roles = "Admin")]
     [HttpPost(nameof(CreateCalendarDay))]
-    
     public async Task<ActionResult<CalendarDayDTO>> CreateCalendarDay ([FromBody] CreateCalendarDayDTO dto)
     {
         var created = await service.Create(dto);

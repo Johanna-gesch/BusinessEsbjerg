@@ -35,7 +35,10 @@ function statusText(status: SharedCalendarDayStatus): string {
             return "Public Holiday";
     }
 }
-
+/**
+ * Month view of the shared calendar. One row per employee and one color
+ * cell per day. The arrows change month, and only the month on screen is fetched.
+ */
 export function SharedCalendar(){
     const today = new Date();
     const [year, setYear] = useState(today.getFullYear());

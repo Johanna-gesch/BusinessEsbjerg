@@ -1,5 +1,8 @@
 namespace Service.DTOs.SharedCalendarDTos;
 
+/*
+ * One employee in the shared calendar, with a status for every day in the period.
+ */
 public class SharedCalendarEmployeeDto
 {
     public string UserId { get; set; } = "";

@@ -6,6 +6,10 @@ using Service.HolidayServices;
 
 namespace API.Controllers;
 
+/*
+ * Endpoint for the shared calendar. Any logged in user can view it
+ */
+
 [ApiController]
 public class SharedCalendarController (SharedCalendarService service) : ControllerBase
 {

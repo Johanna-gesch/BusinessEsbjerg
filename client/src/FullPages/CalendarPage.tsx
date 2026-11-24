@@ -1,7 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {SharedCalendar} from "@/Components/CalendarComponents/SharedCalendar.tsx";
 
-
+/** Shows the shared calendar */
 export function CalendarPage() {
     const navigate = useNavigate();
 

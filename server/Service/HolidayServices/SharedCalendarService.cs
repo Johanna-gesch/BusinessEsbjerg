@@ -6,6 +6,11 @@ using Service.DTOs.SharedCalendarDTos;
 
 namespace Service.HolidayServices;
 
+/*
+ * Builds the shared calendar. For every employee with a work schedule it tells,
+ * for each day in a period, it tells the status of the employee.
+ */
+
 public class SharedCalendarService(
     ISharedCalendarRepo repo,
     IUserRepo userRepo,
@@ -69,6 +74,11 @@ public class SharedCalendarService(
         return result;
     }
 
+    
+    /*
+     * Decides the status of one day for one employee. The order of the checks matters:
+     * Public holiday first, then days the employee does not 
+     */
     private static SharedCalendarDayStatus GetStatus(
         DateOnly date,
         List<WorkScheduleHistory> schedulesNewestFirst,
