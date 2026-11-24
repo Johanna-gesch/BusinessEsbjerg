@@ -7,6 +7,9 @@ using Service.DTOs.HolidayDTOs;
 
 namespace Service.HolidayServices.Earnings;
 
+/**
+ * This class calculates and records earned holiday hours.
+ */
 public class EarningService(
     EarningCalculator earningCalculator,
     IEarningRepo earningRepo,
