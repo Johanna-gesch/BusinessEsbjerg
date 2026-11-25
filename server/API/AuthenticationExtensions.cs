@@ -38,9 +38,19 @@ public static class AuthenticationExtensions
         services.AddScoped<EarningService>();
         services.AddScoped<EarningCalculator>();
         services.AddScoped<IEarningRepo, EarningRepo>();
+
+        services.AddScoped<SharedCalendarService>();
+        services.AddScoped<ISharedCalendarRepo, SharedCalendarRepo>();
       
         services.AddScoped<TransactionService>();
         services.AddScoped<ITransactionRepo, TransactionRepo>();
+
+        services.AddScoped<RequestService>();
+        services.AddScoped<IRequestRepo, RequestRepo>();
+
+        services.AddScoped<HolidayBalanceService>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 

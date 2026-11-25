@@ -5,7 +5,12 @@ using Service.DTOs.TransactionDTOs;
 
 namespace Service.HolidayServices;
 
-public class TransactionService(ITransactionRepo transactionRepo, IAccountRepo accountRepo)
+/**
+ * This service class retrieves the history of earned, used, transferred, and adjusted hours.
+ */
+public class TransactionService(
+    ITransactionRepo transactionRepo, 
+    IAccountRepo accountRepo)
 {
     // Retrieves the account's transactions and converts each database entity
     // into a DTO before returning the history to the caller.
@@ -65,12 +70,11 @@ public class TransactionService(ITransactionRepo transactionRepo, IAccountRepo a
             Description = dto.Description
         };
         
-        // Return a DTO instead of exposing the database entity to the caller.
         await transactionRepo.Insert(entity);
-        return ToDto(entity);
+        
+        // Return a DTO instead of exposing the database entity to the caller.
+        return ToDto (entity);
     }
-    
-    
 
     // Converts a database entity into the response DTO.
     // This keeps the persistence model separate from the data returned to the caller.

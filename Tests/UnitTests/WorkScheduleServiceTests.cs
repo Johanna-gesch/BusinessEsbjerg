@@ -8,11 +8,12 @@ namespace Tests.UnitTests;
 public class WorkScheduleServiceTests
 {
     private readonly WorkScheduleRepoStub _repoStub = new WorkScheduleRepoStub();
+    private readonly UserRepoStub _userRepoStub = new UserRepoStub();
     private readonly WorkScheduleService _service;
 
     public WorkScheduleServiceTests()
     {
-        _service = new WorkScheduleService(_repoStub);
+        _service = new WorkScheduleService(_repoStub, _userRepoStub);
         
         //current workweek from 1. sept 2026
         _repoStub.Current.Add(new WorkSchedule
