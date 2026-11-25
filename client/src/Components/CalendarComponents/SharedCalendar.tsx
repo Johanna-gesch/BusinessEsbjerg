@@ -10,16 +10,16 @@ function toIsoDate(year: number, month: number, day: number):string{
     return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-function statusColor(status: SharedCalendarDayStatus): string {
+function statusClass(status: SharedCalendarDayStatus): string {
     switch (status) {
         case SharedCalendarDayStatus.Working:
-            return "#a5d6a7";
+            return "working";
         case SharedCalendarDayStatus.Holiday:
-            return "#ffb74d";
+            return "holiday";
         case SharedCalendarDayStatus.Off:
-            return "#eeeeee";
+            return "off";
         case SharedCalendarDayStatus.PublicHoliday:
-            return "#90caf9";
+            return "public-holiday";
     }
 }
 
@@ -85,30 +85,31 @@ export function SharedCalendar(){
     });
 
     return (
-        <div>
-            <div>
-                <button onClick={() => changeMonth(-1)}>&lt;</button>
-                <strong style={{margin: "0 12px"}}>{monthTitle}</strong>
-                <button onClick={() => changeMonth(1)}>&gt;</button>
+        <section className="surface-card shared-calendar">
+            <div className="calendar-toolbar">
+                <button className="button button-secondary calendar-nav-button" aria-label="Previous month" onClick={() => changeMonth(-1)}>&lt;</button>
+                <strong className="calendar-month-title">{monthTitle}</strong>
+                <button className="button button-secondary calendar-nav-button" aria-label="Next month" onClick={() => changeMonth(1)}>&gt;</button>
             </div>
 
-            <p>
-                <span style={{background: statusColor(SharedCalendarDayStatus.Working), padding: "0 8px"}}>&nbsp;</span> At work{" "}
-                <span style={{background: statusColor(SharedCalendarDayStatus.Holiday), padding: "0 8px"}}>&nbsp;</span> On holiday{" "}
-                <span style={{background: statusColor(SharedCalendarDayStatus.Off), padding: "0 8px"}}>&nbsp;</span> Not working {" "}
-                <span style={{background: statusColor(SharedCalendarDayStatus.PublicHoliday), padding: "0 8px"}}>&nbsp;</span> Public holiday{" "}
-            </p>
+            <div className="calendar-legend">
+                <span><i className="calendar-legend-swatch is-working" />At work</span>
+                <span><i className="calendar-legend-swatch is-holiday" />On holiday</span>
+                <span><i className="calendar-legend-swatch is-off" />Not working</span>
+                <span><i className="calendar-legend-swatch is-public-holiday" />Public holiday</span>
+            </div>
 
-            {error && <p>{error}</p>}
-            {!error && employees.length === 0 && <p>No employees to show.</p>}
+            {error && <p className="form-message form-message-error">{error}</p>}
+            {!error && employees.length === 0 && <p className="empty-state">No employees to show.</p>}
 
             {employees.length > 0 && (
-                <table style={{borderCollapse: "collapse"}}>
+                <div className="calendar-table-scroll">
+                <table className="data-table calendar-table">
                     <thead>
                     <tr>
-                        <th style={{textAlign: "left", paddingRight: 12}}>Employee</th>
+                        <th className="calendar-employee-heading">Employee</th>
                         {headerDays.map(day => (
-                            <th key={day.date} style={{width: 24, fontWeight: "normal"}}>
+                            <th key={day.date}>
                                 {Number(day.date.slice(8, 10))}
                             </th>
                         ))}
@@ -117,23 +118,20 @@ export function SharedCalendar(){
                     <tbody>
                     {employees.map(employee => (
                         <tr key={employee.userId}>
-                            <td style={{paddingRight: 12}}>{employee.username}</td>
+                            <td>{employee.username}</td>
                             {employee.days.map(day => (
                                 <td
                                     key={day.date}
                                     title={`${day.date}: ${statusText(day.status)}`}
-                                    style={{
-                                        background: statusColor(day.status),
-                                        border: "1px solid #ffffff",
-                                        height: 24,
-                                    }}
+                                    className={`calendar-day is-${statusClass(day.status)}`}
                                 />
                             ))}
                         </tr>
                     ))}
                     </tbody>
                 </table>
+                </div>
             )}
-        </div>
+        </section>
     );
 }

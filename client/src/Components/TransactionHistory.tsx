@@ -104,15 +104,15 @@ export function TransactionHistory({
     }
 
     return (
-        <section>
-            <h2>TransactionHistory</h2>
+        <section className="transaction-history">
+            <h2>Transaction history</h2>
 
             <p>Total accrued: {formatHours(accruedHours)} timer</p>
 
             {transactions.length === 0 ? (
                 <p>There are no transactions yet.</p>
             ) : (
-                <table>
+                <table className="data-table">
                     <thead>
                     <tr>
                         <th>Date</th>

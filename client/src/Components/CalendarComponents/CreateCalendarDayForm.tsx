@@ -43,7 +43,7 @@ export function CreateCalendarDayForm(){
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="surface-card admin-form public-holiday-form" onSubmit={handleSubmit}>
             <h2>Create public holiday</h2>
 
             <div>
@@ -65,10 +65,10 @@ export function CreateCalendarDayForm(){
                 />
             </div>
 
-            <button type="submit">Save</button>
+            <button className="button button-primary" type="submit">Save</button>
 
-            {message && <p>{message}</p>}
-            {error && <p>{error}</p>}
+            {message && <p className="form-message form-message-success">{message}</p>}
+            {error && <p className="form-message form-message-error">{error}</p>}
         </form>
     );
 }
