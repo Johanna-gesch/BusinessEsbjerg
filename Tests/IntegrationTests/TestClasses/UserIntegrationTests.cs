@@ -6,6 +6,7 @@ using Infra.Entities.Users;
 
 namespace Tests.IntegrationTests.TestClasses;
 
+[Collection("Integration tests")]
 public class UserIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;

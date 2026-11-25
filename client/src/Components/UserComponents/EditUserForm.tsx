@@ -57,11 +57,15 @@ export function EditUserForm({ user, onClose, onUpdated }: EditUserProps) {
             <div>
                 <h2>Edit User</h2>
 
-                <form onSubmit={handleSaveUser}>
+                <form
+                    data-testid={"edit-user-form"}
+                    onSubmit={handleSaveUser}
+                >
 
                     <div>
-                        <label>Username</label>
+                        <label htmlFor="edit-username">Username</label>
                         <input
+                            id="edit-username"
                             type="text"
                             value={editForm.username}
                             onChange={e =>

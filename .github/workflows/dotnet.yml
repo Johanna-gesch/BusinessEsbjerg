@@ -50,6 +50,15 @@ jobs:
           cache: npm
           cache-dependency-path: Tests/E2ETests/package-lock.json
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Install frontend dependencies
+        working-directory: client
+        run: bun install
+
       - name: Install dependencies
         working-directory: Tests/E2ETests
         run: npm ci
@@ -61,3 +70,6 @@ jobs:
       - name: Run Playwright tests
         working-directory: Tests/E2ETests
         run: npx playwright test
+        env:
+          JwtSecret: ${{ secrets.jwtSecret }}
+          TEST_DB: ${{ secrets.TEST_DB }}

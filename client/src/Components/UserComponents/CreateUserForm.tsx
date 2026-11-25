@@ -35,33 +35,40 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
     }
 
     return (
-        <div>
+        <form
+            data-testid="create-user-form"
+            onSubmit={e => {
+                e.preventDefault();
+                void handleCreateUser();
+            }}
+        >
             Create User:
+
             <input
-                placeholder={"username"}
+                placeholder="username"
                 value={usernameField}
-                onChange={(e) => setUsernameField(e.target.value)}
+                onChange={e => setUsernameField(e.target.value)}
             />
+
             <input
-                type={"password"}
-                placeholder={"password"}
+                type="password"
+                placeholder="password"
                 value={passwordField}
                 onChange={e => setPasswordField(e.target.value)}
             />
+
             <select
                 value={role}
-                onChange={(e) => setRole(Number(e.target.value) as UserRole)}
+                onChange={e => setRole(Number(e.target.value) as UserRole)}
             >
                 <option value={UserRole.User}>User</option>
                 <option value={UserRole.Admin}>Admin</option>
                 <option value={UserRole.Accountant}>Accountant</option>
             </select>
-            <button
-                type={"button"}
-                onClick={handleCreateUser}
-            >
+
+            <button type="submit">
                 Save
             </button>
-        </div>
-    )
+        </form>
+    );
 }

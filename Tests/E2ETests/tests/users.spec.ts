@@ -1,47 +1,47 @@
+import { test, expect } from '../MyFixtures';
 
-import { test, expect, type Page } from '@playwright/test';
 
-// HELPER METHOD
-async function loginAsAdmin(page: Page) {
-
-    await page.goto('/');
-
-    await page.getByPlaceholder('Username').fill('playwright_admin');
-    await page.getByPlaceholder('Password').fill('PlaywrightPassword123');
-
-    await page.getByRole('button', { name: 'Login' }).click();
-
-    await expect(page).toHaveURL(/admin/);
-}
+// BEFORE EACH
+test.beforeEach(async ({ helpers }) => {
+    await helpers.loginAsAdmin();
+    await helpers.goToAdminPage();
+});
 
 // LOGIN
 test('User can log in', async ({ page }) => {
-    await loginAsAdmin(page);
     page.on('console', msg => {
         console.log('[Browser]', msg.text());
     });
 });
 
 // CREATE
-test('Admin can create a user', async ({ page }) => {
-    await loginAsAdmin(page);
+test('Admin can create a user', async ({ page, helpers }) => {
 
     const username = `e2e_create_${Date.now()}`;
 
-    await page.getByPlaceholder('username').fill(username);
-    await page.getByPlaceholder('password').fill('TestPassword123');
+    try {
 
-    await page.getByRole('button', { name: 'Save' }).click();
+        const createUserForm = page.getByTestId('create-user-form');
 
-    const createdUser = page.getByTestId('user-row')
-        .filter({ hasText: username });
+        await createUserForm.getByPlaceholder('username').fill(username);
+        await createUserForm.getByPlaceholder('password').fill('TestPassword123');
+        await createUserForm.getByRole('button', { name: 'Save' }).click();
 
-    await expect(createdUser).toBeVisible();
+        const createdUser = page.getByTestId('user-row')
+            .filter({ hasText: username });
+
+        await expect(createdUser).toBeVisible();
+
+    } finally {
+        // Cleanup
+        await helpers.removeUser(username);
+    }
+
+
 });
 
 // READ
 test('Admin can read users', async ({ page }) => {
-    await loginAsAdmin(page);
 
     await expect(
         page.getByTestId('user-row').first()
@@ -53,70 +53,102 @@ test('Admin can read users', async ({ page }) => {
 });
 
 // UPDATE
-test('Admin can update a user', async ({ page }) => {
-    await loginAsAdmin(page);
+test('Admin can update a user', async ({ page, helpers }) => {
 
     const username = `e2e_update_${Date.now()}`;
     const updatedUsername = `${username}_updated`;
 
-    await page.getByPlaceholder('username').fill(username);
-    await page.getByPlaceholder('password').fill('TestPassword123');
-    await page.getByRole('button', { name: 'Save' }).click();
+    // Keep track of the current username for cleanup
+    let currentUsername = username;
 
-    // Find rækken ud fra brugernavnet
-    const rowBeforeEdit = page.getByTestId('user-row')
-        .filter({ hasText: username });
+    try {
+        // Arrange
+        const createUserForm = page.getByTestId('create-user-form');
 
-    await expect(rowBeforeEdit).toBeVisible();
+        await createUserForm.getByPlaceholder('username').fill(username);
+        await createUserForm.getByPlaceholder('password').fill('TestPassword123');
+        await createUserForm.getByRole('button', { name: 'Save' }).click();
 
-    // Gem rækkens stabile ID
-    const userId = await rowBeforeEdit.getAttribute('data-user-id');
+        const rowBeforeEdit = page.getByTestId('user-row')
+            .filter({ hasText: username });
 
-    if (!userId) {
-        throw new Error('Could not find user ID');
+        await expect(rowBeforeEdit).toBeVisible();
+
+        // Get user ID
+        const userId = await rowBeforeEdit.getAttribute('data-user-id');
+
+        if (!userId) {
+            throw new Error('Could not find user ID');
+        }
+
+        // Act
+        const userRow = page.locator(`[data-user-id="${userId}"]`);
+
+        await userRow.getByRole('button', { name: 'Edit' }).click();
+
+        const usernameInput = page.getByLabel('Username');
+
+        await usernameInput.fill(updatedUsername);
+
+        const editForm = page.getByTestId('edit-user-form');
+
+        await editForm.getByRole('button', { name: 'Save' }).click();
+
+        await expect(
+            page.getByTestId('user-row').filter({ hasText: updatedUsername })
+        ).toBeVisible();
+
+        // Update cleanup username
+        currentUsername = updatedUsername;
     }
-
-    // Find nu rækken ud fra ID i stedet for brugernavnet
-    const userRow = page.locator(`[data-user-id="${userId}"]`);
-
-    // Klik Edit
-    await userRow.getByRole('button', { name: 'Edit' }).click();
-
-    // Find og rediger inputfeltet
-    const usernameInput = userRow.locator('input');
-
-    await expect(usernameInput).toBeVisible();
-    await usernameInput.fill(updatedUsername);
-
-    // Gem ændringen
-    await userRow.getByRole('button', { name: 'Save' }).click();
-
-    // Kontrollér det nye brugernavn
-    await expect(
-        page.getByTestId('user-row').filter({ hasText: updatedUsername })
-    ).toBeVisible();
+    finally {
+        // Cleanup
+        await helpers.removeUser(currentUsername);
+    }
 });
 
+
 // DELETE
-test('Admin can delete a user', async ({ page }) => {
-    await loginAsAdmin(page);
+
+test('Admin can delete a user', async ({ page, helpers }) => {
 
     const username = `e2e_delete_${Date.now()}`;
 
-    // Create a user for the delete test
-    await page.getByPlaceholder('username').fill(username);
-    await page.getByPlaceholder('password').fill('TestPassword123');
-    await page.getByRole('button', { name: 'Save' }).click();
+    page.on('response', response => {
+        if (response.request().method() === 'DELETE') {
+            console.log(
+                'DELETE RESPONSE:',
+                response.status(),
+                response.url()
+            );
+        }
+    });
 
-    const userRow = page.getByTestId('user-row')
-        .filter({ hasText: username });
+    try {
+        // Arrange
+        // Create a user for the delete test
+        const createUserForm = page.getByTestId('create-user-form');
 
-    await expect(userRow).toBeVisible();
+        await createUserForm.getByPlaceholder('username').fill(username);
+        await createUserForm.getByPlaceholder('password').fill('TestPassword123');
+        await createUserForm.getByRole('button', { name: 'Save' }).click();
 
-    // Accept the confirmation dialog
-    page.once('dialog', dialog => dialog.accept());
+        const userRow = page.getByTestId('user-row')
+            .filter({ hasText: username });
 
-    await userRow.getByRole('button', { name: 'Delete' }).click();
+        await expect(userRow).toBeVisible();
 
-    await expect(userRow).toHaveCount(0);
+        // Act
+        page.once('dialog', dialog => dialog.accept());
+
+        await userRow.getByRole('button', { name: 'Delete' }).click();
+
+        // Assert
+        await expect(userRow).toHaveCount(0);
+    }
+    finally {
+        // Cleanup
+        await helpers.removeUser(username);
+    }
 });
+
