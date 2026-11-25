@@ -10,7 +10,7 @@ using Service.HolidayServices;
 namespace API.Controllers;
 
 [ApiController]
-public class AccountController(AccountService service, AccountOverviewService overviewService) : ControllerBase
+public class AccountController(AccountService service, AccountOverviewService overviewService, HolidayBalanceService holidayBalanceService) : ControllerBase
 {
     [Authorize]
     [HttpGet(nameof(GetAccountById))]
@@ -35,6 +35,15 @@ public class AccountController(AccountService service, AccountOverviewService ov
     {
         var overview = await overviewService.GetOverview(DateOnly.FromDateTime(DateTime.Today));
         return Ok(overview);
-
+    }
+    
+    [Authorize]
+    [HttpGet(nameof(GetAvailableBalance))]
+    public async Task<ActionResult<decimal>> GetAvailableBalance(
+        Guid accountId,
+        DateOnly date)
+    {
+        var balance = await holidayBalanceService.GetAvailableBalance(accountId, date);
+        return Ok(balance);
     }
 }

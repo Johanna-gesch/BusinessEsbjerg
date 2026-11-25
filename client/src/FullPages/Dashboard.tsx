@@ -97,7 +97,10 @@ export function Dashboard() {
                             : "Ferieuge 6"}
                     </h3>
 
-                    <TransactionHistory accountId={account.id} />
+                    <TransactionHistory
+                        accountId={account.id}
+                        userId={user.userId}
+                        accountType={account.type}/>
                 </section>
             ))}
         </div>
