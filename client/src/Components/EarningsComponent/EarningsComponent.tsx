@@ -44,13 +44,13 @@ export function EarningsComponent({user}: EarningsProps) {
     }, [user?.userId]);
 
     return (
-        <div>
+        <div className="earnings-section">
             <section className="holiday-balance">
                 <h2>Your available holidays</h2>
 
-                {loadingEarnings && <p>Loading holiday balance...</p>}
+                {loadingEarnings && <p className="empty-state">Loading holiday balance...</p>}
 
-                {earningsError && <p>{earningsError}</p>}
+                {earningsError && <p className="form-message form-message-error">{earningsError}</p>}
 
                 {!loadingEarnings && !earningsError && earnings && (
                     <div className="holiday-balance-grid">

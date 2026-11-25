@@ -1,10 +1,11 @@
 
 import apiClient from "@/services/ApiClient.ts";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import type { User } from "@/api/Api.ts";
 import { EditUserForm } from "./EditUserForm.tsx";
 
 const MyApi = apiClient.api;
+const USERS_PER_PAGE = 10;
 
 type UsersListProps = {
     users: User[];
@@ -14,6 +15,20 @@ type UsersListProps = {
 export function UserList({ users, setUsers }: UsersListProps) {
 
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [page, setPage] = useState(1);
+
+    const pageCount = Math.max(1, Math.ceil(users.length / USERS_PER_PAGE));
+    const currentPage = Math.min(page, pageCount);
+    const visibleUsers = users.slice(
+        (currentPage - 1) * USERS_PER_PAGE,
+        currentPage * USERS_PER_PAGE,
+    );
+
+    useEffect(() => {
+        if (page > pageCount) {
+            setPage(pageCount);
+        }
+    }, [page, pageCount]);
 
     function handleDeleteUser(userId: string) {
         if (!window.confirm("Are you sure you want to delete this user?")) {
@@ -44,26 +59,56 @@ export function UserList({ users, setUsers }: UsersListProps) {
     }
 
     return (
-        <div>
-            {users.map(user => (
+        <div className="user-list">
+            {visibleUsers.map(user => (
                 <div
+                    className="user-row"
                     key={user.userId}
                     data-testid="user-row"
                     data-user-id={user.userId}
                 >
-                    <div>
-                        <span>{user.username}</span>
+                    <div className="user-row-main">
+                        <span className="user-avatar" aria-hidden="true">{user.username.slice(0, 1).toUpperCase()}</span>
+                        <span className="user-name">{user.username}</span>
 
-                        <button onClick={() => setEditingUser(user)}>
+                        <div className="user-row-actions">
+                        <button className="button button-secondary button-small" onClick={() => setEditingUser(user)}>
                             Edit
                         </button>
 
-                        <button onClick={() => handleDeleteUser(user.userId)}>
+                        <button className="button button-danger button-small" onClick={() => handleDeleteUser(user.userId)}>
                             Delete
                         </button>
+                        </div>
                     </div>
                 </div>
             ))}
+
+            {pageCount > 1 && (
+                <nav className="user-pagination" aria-label="User list pages">
+                    <span className="pagination-summary">
+                        Page {currentPage} of {pageCount}
+                    </span>
+                    <div className="pagination-actions">
+                        <button
+                            className="button button-secondary button-small"
+                            type="button"
+                            disabled={currentPage === 1}
+                            onClick={() => setPage(currentPage - 1)}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            className="button button-secondary button-small"
+                            type="button"
+                            disabled={currentPage === pageCount}
+                            onClick={() => setPage(currentPage + 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </nav>
+            )}
 
             {editingUser && (
                 <EditUserForm

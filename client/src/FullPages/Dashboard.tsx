@@ -16,40 +16,43 @@ export function Dashboard() {
     });
 
     if (!user) {
-        return <p>You must be logged in.</p>;
+        return <main className="page-shell"><p className="notice-card">You must be logged in.</p></main>;
     }
 
     return (
-        <div>
-            <LogOutButton />
-
+        <main className="page-shell dashboard-page">
             <header className="dashboard-header">
                 <h1>HI {user.username}!</h1>
 
-                {user.role === UserRole.Admin && (
-                    <button onClick={() => navigate("/admin")}>
-                        Admin
-                    </button>
-                )}
+                <nav className="dashboard-actions" aria-label="Main navigation">
+                    {user.role === UserRole.Admin && (
+                        <button className="button button-secondary" onClick={() => navigate("/admin")}>
+                            Admin
+                        </button>
+                    )}
 
-                <button onClick={() => navigate("/sharedcalendar")}>
-                    Shared Calendar
-                </button>
-
-                {(user.role === UserRole.Accountant) && (
-                    <button onClick={() => navigate("/accountant")}>
-                        Accounting
+                    <button className="button button-secondary" onClick={() => navigate("/sharedcalendar")}>
+                        Shared Calendar
                     </button>
-                )}
+
+                    {(user.role === UserRole.Accountant) && (
+                        <button className="button button-secondary" onClick={() => navigate("/accountant")}>
+                            Accounting
+                        </button>
+                    )}
+
+                    <LogOutButton />
+                </nav>
             </header>
 
             <WorkScheduleCard userId={user.userId} />
 
             <EarningsComponent user={user} />
 
-            <h2>Holiday transactions</h2>
-
-            <AccountList userId={user.userId} />
-        </div>
+            <section className="dashboard-transactions">
+                <h2>Holiday transactions</h2>
+                <AccountList userId={user.userId} />
+            </section>
+        </main>
     );
 }

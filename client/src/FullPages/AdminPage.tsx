@@ -26,17 +26,33 @@ export function AdminPage() {
     }, []);
 
     return (
-        <div>
-            <h1>ADMIN PAGE</h1>
-
-            <button onClick={() => navigate("/dashboard")}>
+        <main className="page-shell admin-page">
+            <header className="page-header">
+                <div>
+                    <p className="eyebrow">Workspace</p>
+                    <h1>Admin page</h1>
+                </div>
+                <button className="button button-secondary" onClick={() => navigate("/dashboard")}>
                 Back to Dashboard
-            </button>
+                </button>
+            </header>
 
-            <UserList users={users} setUsers={setUsers} />
-            <CreateUserForm setUsers={setUsers} />
-            <CreateWorkScheduleForm users={users} />
-            <CreateCalendarDayForm />
-        </div>
+            <div className="admin-form-stack">
+                <CreateWorkScheduleForm users={users} />
+                <CreateCalendarDayForm />
+                <CreateUserForm setUsers={setUsers} />
+            </div>
+
+            <section className="admin-users-section surface-card">
+                <div className="section-heading">
+                    <div>
+                        <p className="eyebrow">People</p>
+                        <h2>Manage users</h2>
+                    </div>
+                    <span className="count-pill">{users.length} users</span>
+                </div>
+                <UserList users={users} setUsers={setUsers} />
+            </section>
+        </main>
     );
 }

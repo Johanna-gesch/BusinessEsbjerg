@@ -77,50 +77,54 @@ export function CreateWorkScheduleForm({users}: Props){
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="surface-card admin-form schedule-form" onSubmit={handleSubmit}>
             <h2>Create work schedule</h2>
 
-            <div>
-                <label>User</label>
-                <select value={userId} onChange={e => setUserId(e.target.value)}>
-                    <option value="">Choose user...</option>
-                    {users.map(user => (
-                        <option key={user.userId} value={user.userId}>
-                            {user.username}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <div className="schedule-form-meta">
+                <div>
+                    <label>User</label>
+                    <select value={userId} onChange={e => setUserId(e.target.value)}>
+                        <option value="">Choose user...</option>
+                        {users.map(user => (
+                            <option key={user.userId} value={user.userId}>
+                                {user.username}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-            <div>
-                <label>Effective from</label>
-                <input
-                    type="date"
-                    value={effectiveFrom}
-                    onChange={e => setEffectiveFrom(e.target.value)}
-                />
-            </div>
-
-            {days.map(day => (
-                <div key={day.key}>
-                    <label>{day.label}</label>
+                <div>
+                    <label>Effective from</label>
                     <input
-                        type="number"
-                        min="0"
-                        max="24"
-                        step="0.5"
-                        value={hours[day.key]}
-                        onChange={e => setHours({...hours, [day.key]: e.target.value})}
+                        type="date"
+                        value={effectiveFrom}
+                        onChange={e => setEffectiveFrom(e.target.value)}
                     />
                 </div>
-            ))}
+            </div>
+
+            <div className="schedule-weekdays">
+                {days.map(day => (
+                    <div key={day.key}>
+                        <label>{day.label}</label>
+                        <input
+                            type="number"
+                            min="0"
+                            max="24"
+                            step="0.5"
+                            value={hours[day.key]}
+                            onChange={e => setHours({...hours, [day.key]: e.target.value})}
+                        />
+                    </div>
+                ))}
+            </div>
 
             <p>Total per week: {totalPerWeek} hours</p>
 
-            <button type="submit">Save</button>
+            <button className="button button-primary" type="submit">Save</button>
 
-            {message && <p>{message}</p>}
-            {error && <p>{error}</p>}
+            {message && <p className="form-message form-message-success">{message}</p>}
+            {error && <p className="form-message form-message-error">{error}</p>}
         </form>
     );
 

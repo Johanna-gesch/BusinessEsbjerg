@@ -56,7 +56,7 @@ export function AccountList({ userId }: AccountListProps) {
     }
 
     return (
-        <div>
+        <div className="account-list">
             {accounts.map(account => (
                 <AccountCard
                     key={account.id}

@@ -6,6 +6,7 @@
  */
 
 import { StrictMode } from "react";
+import "./index.css";
 import { createRoot } from "react-dom/client";
 import {createBrowserRouter, Route, RouterProvider} from "react-router-dom"
 import {AdminPage} from "@/FullPages/AdminPage.tsx";

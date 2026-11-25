@@ -87,15 +87,15 @@ export function TransactionHistory({
     }
 
     return (
-        <section>
-            <h2>TransactionHistory</h2>
+        <section className="transaction-history">
+            <h2>Transaction history</h2>
 
             <p>Balance: {formatHours(balance)} timer</p>
 
             {transactions.length === 0 ? (
                 <p>There is no transactions yet.</p>
             ) : (
-                <table>
+                <table className="data-table">
                     <thead>
                     <tr>
                         <th>Date</th>

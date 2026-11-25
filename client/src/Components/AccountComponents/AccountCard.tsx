@@ -12,7 +12,7 @@ export function AccountCard({ account }: AccountCardProps) {
         : "Sixth holiday week";
 
     return (
-        <div>
+        <article className="surface-card account-card">
             <h3>{accountTitle}</h3>
 
             <p>
@@ -22,6 +22,6 @@ export function AccountCard({ account }: AccountCardProps) {
             </p>
 
             <TransactionHistory accountId={account.id} />
-        </div>
+        </article>
     );
 }

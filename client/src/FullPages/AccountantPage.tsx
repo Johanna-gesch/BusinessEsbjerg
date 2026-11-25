@@ -6,15 +6,19 @@ export function AccountantPage(){
     const navigate = useNavigate();
 
     return (
-        <div>
-            <h1> Accounting </h1>
-
-            <button onClick={() => navigate("/dashboard")}>
+        <main className="page-shell accountant-page">
+            <header className="page-header">
+                <div>
+                    <p className="eyebrow">Team overview</p>
+                    <h1>Accounting</h1>
+                </div>
+                <button className="button button-secondary" onClick={() => navigate("/dashboard")}>
                 Back to Dashboard
-            </button>
+                </button>
+            </header>
 
             <AccountOverview/>
 
-        </div>
+        </main>
     );
 }

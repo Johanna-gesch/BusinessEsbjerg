@@ -40,8 +40,15 @@ export default function LoginPage() {
         }
     };
     return (
-        <form onSubmit={handleLogin}>
+        <main className="login-page">
+            <section className="login-card">
+                <div className="login-mark" aria-hidden="true">BE</div>
+                <p className="eyebrow">Business Esbjerg</p>
+                <h1>Holiday planner</h1>
+                <p className="login-intro">Sign in to view your holiday balance and work schedule.</p>
+                <form className="login-form" onSubmit={handleLogin}>
             <input
+                aria-label="Username"
                 type="text"
                 placeholder="Username"
                 value={username}
@@ -50,6 +57,7 @@ export default function LoginPage() {
             />
 
             <input
+                aria-label="Password"
                 type="password"
                 placeholder="Password"
                 value={password}
@@ -57,9 +65,11 @@ export default function LoginPage() {
                     setPassword(e.target.value)}
             />
 
-            <button type="submit">Login</button>
+            <button className="button button-primary" type="submit">Login</button>
 
-            {error && <p>{error}</p>}
-        </form>
+            {error && <p className="form-message form-message-error">{error}</p>}
+                </form>
+            </section>
+        </main>
     );
 }
