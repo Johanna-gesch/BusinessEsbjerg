@@ -24,7 +24,16 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
 
             const updatedUsers = await MyApi.getUsers.userGetUsers();
 
-            setUsers(updatedUsers);
+            const newUser = updatedUsers.find(
+                user => user.username === usernameField
+            );
+
+            if (newUser) {
+                setUsers([
+                    newUser,
+                    ...updatedUsers.filter(user => user.userId !== newUser.userId)
+                ]);
+            }
 
             setUsernameField("");
             setPasswordField("");

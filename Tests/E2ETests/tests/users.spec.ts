@@ -86,13 +86,14 @@ test('Admin can update a user', async ({ page, helpers }) => {
 
         await userRow.getByRole('button', { name: 'Edit' }).click();
 
-        const usernameInput = page.getByLabel('Username');
+        const editForm = page.getByTestId('edit-user-form');
+        const usernameInput = editForm.getByLabel('Username');
 
         await usernameInput.fill(updatedUsername);
 
-        const editForm = page.getByTestId('edit-user-form');
-
         await editForm.getByRole('button', { name: 'Save' }).click();
+
+        await expect(page.locator('.modal-backdrop')).toHaveCount(0);
 
         await expect(
             page.getByTestId('user-row').filter({ hasText: updatedUsername })
@@ -102,8 +103,11 @@ test('Admin can update a user', async ({ page, helpers }) => {
         currentUsername = updatedUsername;
     }
     finally {
-        // Cleanup
-        await helpers.removeUser(currentUsername);
+        try {
+            await helpers.removeUser(currentUsername);
+        } catch (error) {
+            console.error("Cleanup failed:", error);
+        }
     }
 });
 

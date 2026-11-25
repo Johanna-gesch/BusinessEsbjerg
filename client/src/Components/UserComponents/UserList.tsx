@@ -30,6 +30,10 @@ export function UserList({ users, setUsers }: UsersListProps) {
         }
     }, [page, pageCount]);
 
+    useEffect(() => {
+        setPage(1);
+    }, [users.length]);
+
     function handleDeleteUser(userId: string) {
         if (!window.confirm("Are you sure you want to delete this user?")) {
             return;
