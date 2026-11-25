@@ -6,6 +6,7 @@ using Infra.Entities.HolidayTracking.Requests;
 using Infra.Entities.HolidayTracking.WorkSchedule;
 using Service.DTOs.RequestDTOs;
 using Service.HolidayServices;
+using Service.HolidayServices.Earnings;
 using Tests.UnitTests.Stubs;
 
 namespace Tests.UnitTests;
@@ -34,11 +35,19 @@ public class RequestServiceTests
         var calendarDayService = new CalendarDayService(
             _calendarDayRepoStub);
 
+        var earningService = new EarningService(
+            new EarningCalculator(),
+            _earningRepoStub,
+            _accountRepoStub,
+            _userRepoStub,
+            _scheduleRepoStub);
+
         _balanceService = new HolidayBalanceService(
             _earningRepoStub,
             _transactionRepoStub,
             _accountRepoStub,
-            workScheduleService);
+            workScheduleService,
+            earningService);
 
         _requestService = new RequestService(
             _repoStub,
@@ -112,7 +121,6 @@ public class RequestServiceTests
 
     #endregion
 
-
     // *---* READ TESTS *---* //
 
     #region Read Tests
@@ -171,8 +179,7 @@ public class RequestServiceTests
         Assert.True(_unitOfWorkStub.TransactionStarted);
         Assert.True(_unitOfWorkStub.TransactionCommitted);
     }
-
-
+    
     /**
      * This test does the following:
      * Calculates the required hours
@@ -275,7 +282,6 @@ public class RequestServiceTests
         Assert.True(_unitOfWorkStub.TransactionCommitted);
         Assert.False(_unitOfWorkStub.TransactionRolledBack);
     }
-
     
     /**
      * This test ensures that the debt check happens before the transaction begins.
@@ -378,7 +384,149 @@ public class RequestServiceTests
         Assert.False(_unitOfWorkStub.TransactionCommitted);
         Assert.False(_unitOfWorkStub.TransactionRolledBack);
     }
+    
+    [Fact]
+    public async Task ApproveRequest_ExistingApprovedRequestMakesBalanceNegative_ThrowsValidationException()
+    {
+        // Arrange
+        var userId = "user123";
+        var year = DateTime.Today.Year + 1;
 
+        await AddApprovalTestData(userId);
+
+        var existingRequest = new HolidayRequest
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            StartDate = new DateOnly(year, 9, 1),
+            EndDate = new DateOnly(year + 1, 8, 29),
+            CreatedAt = DateTime.UtcNow,
+            Status = HolidayRequestStatus.Approved
+        };
+
+        await _repoStub.Insert(existingRequest);
+
+        var currentRequest = new HolidayRequest
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            StartDate = new DateOnly(year + 1, 8, 30),
+            EndDate = new DateOnly(year + 1, 8, 30),
+            CreatedAt = DateTime.UtcNow,
+            Status = HolidayRequestStatus.Pending
+        };
+
+        await _repoStub.Insert(currentRequest);
+
+        // Act
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            _requestService.UpdateRequestStatusAsync(
+                currentRequest.Id,
+                HolidayRequestStatus.Approved));
+
+        // Assert
+        var unchangedRequest = await _repoStub.GetById(currentRequest.Id);
+
+        Assert.NotNull(unchangedRequest);
+        Assert.Equal(HolidayRequestStatus.Pending, unchangedRequest.Status);
+
+        Assert.Empty(_transactionRepoStub.Transactions);
+        Assert.False(_unitOfWorkStub.TransactionStarted);
+        Assert.False(_unitOfWorkStub.TransactionCommitted);
+    }
+    
+    [Fact]
+    public async Task ApproveRequest_NonApprovedRequestsAreIgnored_ApprovesRequest()
+    {
+        // Arrange
+        var userId = "user123";
+        var year = DateTime.Today.Year + 1;
+
+        await AddApprovalTestData(userId);
+
+        var statuses = new[]
+        {
+            HolidayRequestStatus.Pending,
+            HolidayRequestStatus.Rejected,
+            HolidayRequestStatus.Cancelled
+        };
+
+        foreach (var status in statuses)
+        {
+            await _repoStub.Insert(new HolidayRequest
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                StartDate = new DateOnly(year, 9, 1),
+                EndDate = new DateOnly(year + 1, 8, 29),
+                CreatedAt = DateTime.UtcNow,
+                Status = status
+            });
+        }
+
+        var currentRequest = new HolidayRequest
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            StartDate = new DateOnly(year + 1, 8, 30),
+            EndDate = new DateOnly(year + 1, 8, 30),
+            CreatedAt = DateTime.UtcNow,
+            Status = HolidayRequestStatus.Pending
+        };
+
+        await _repoStub.Insert(currentRequest);
+
+        // Act
+        await _requestService.UpdateRequestStatusAsync(
+            currentRequest.Id,
+            HolidayRequestStatus.Approved);
+
+        // Assert
+        var updatedRequest = await _repoStub.GetById(currentRequest.Id);
+
+        Assert.NotNull(updatedRequest);
+        Assert.Equal(HolidayRequestStatus.Approved, updatedRequest.Status);
+
+        Assert.True(_unitOfWorkStub.TransactionStarted);
+        Assert.True(_unitOfWorkStub.TransactionCommitted);
+        Assert.False(_unitOfWorkStub.TransactionRolledBack);
+    }
+    
+    [Fact]
+    public async Task ApproveRequest_CrossesAugust31_ChecksBothHolidayYears()
+    {
+        // Arrange
+        var userId = "user123";
+        var year = DateTime.Today.Year + 1;
+
+        await AddApprovalTestData(userId);
+
+        var request = new HolidayRequest
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            StartDate = new DateOnly(year, 8, 30),
+            EndDate = new DateOnly(year, 9, 3),
+            CreatedAt = DateTime.UtcNow,
+            Status = HolidayRequestStatus.Pending
+        };
+
+        await _repoStub.Insert(request);
+
+        // Act
+        await _requestService.UpdateRequestStatusAsync(
+            request.Id,
+            HolidayRequestStatus.Approved);
+
+        // Assert
+        var updatedRequest = await _repoStub.GetById(request.Id);
+
+        Assert.NotNull(updatedRequest);
+        Assert.Equal(HolidayRequestStatus.Approved, updatedRequest.Status);
+
+        Assert.True(_unitOfWorkStub.TransactionStarted);
+        Assert.True(_unitOfWorkStub.TransactionCommitted);
+    }
 
     [Fact]
     public async Task Update_ValidRequest_StatusIsRejected()
@@ -486,5 +634,66 @@ public class RequestServiceTests
             CreatedAt = DateTime.UtcNow,
             Status = HolidayRequestStatus.Pending
         };
+    }
+    
+    private async Task AddApprovalTestData(string userId)
+    {
+        var schedule = new WorkSchedule
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            EffectiveFrom = new DateOnly(DateTime.Today.Year - 1, 1, 1),
+            MondayHours = 7.4m,
+            TuesdayHours = 7.4m,
+            WednesdayHours = 7.4m,
+            ThursdayHours = 7.4m,
+            FridayHours = 7.4m
+        };
+
+        _scheduleRepoStub.Current.Add(schedule);
+
+        _scheduleRepoStub.History.Add(new WorkScheduleHistory
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            EffectiveFrom = schedule.EffectiveFrom,
+            MondayHours = 7.4m,
+            TuesdayHours = 7.4m,
+            WednesdayHours = 7.4m,
+            ThursdayHours = 7.4m,
+            FridayHours = 7.4m
+        });
+
+        var week1_5Account = new HolidayAccount
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Type = HolidayType.Week1_5
+        };
+
+        var week6Account = new HolidayAccount
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Type = HolidayType.Week6
+        };
+
+        await _accountRepoStub.InsertAsync(week1_5Account);
+        await _accountRepoStub.InsertAsync(week6Account);
+
+        await _earningRepoStub.SaveEarningsTransaction(
+            new List<HolidayEarning>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    HolidayAccountId = week1_5Account.Id,
+                    EarnedDate = new DateOnly(DateTime.Today.Year - 1, 1, 1),
+                    EarnedHours = 40m,
+                    EarnedDays = 0m,
+                    ExpiryDate = new DateOnly(2099, 12, 31)
+                }
+            });
     }
 }
