@@ -7,6 +7,7 @@ import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkSchedule
 import apiClient from "@/services/ApiClient.ts";
 import {TransactionHistory} from "@/Components/TransactionHistory.tsx";
 import {EarningsComponent} from "@/Components/EarningsComponent/EarningsComponent.tsx";
+import {MyHolidayRequests} from "@/Components/RequestComponents/MyHolidayRequests.tsx";
 
 export function Dashboard() {
     const navigate = useNavigate();
@@ -103,6 +104,8 @@ export function Dashboard() {
                         accountType={account.type}/>
                 </section>
             ))}
+
+            <MyHolidayRequests />
         </div>
     );
 }
