@@ -35,6 +35,12 @@ export function Dashboard() {
                 <button onClick={() => navigate("/sharedcalendar")}>
                     Shared Calendar
                 </button>
+
+                {(user.role === UserRole.Accountant) && (
+                    <button onClick={() => navigate("/accountant")}>
+                        Accounting
+                    </button>
+                )}
             </header>
 
             <WorkScheduleCard userId={user.userId} />

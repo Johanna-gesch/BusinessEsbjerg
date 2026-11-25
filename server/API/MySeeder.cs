@@ -8,7 +8,6 @@ using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Entities.HolidayTracking.WorkSchedule;
 using Infra.Entities.Users;
 using LinqToDB;
-using Microsoft.AspNetCore.Identity;
 using Service.Security;
 
 namespace API;

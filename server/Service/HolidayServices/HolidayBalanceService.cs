@@ -1,9 +1,11 @@
 ﻿using Infra;
 using Infra.Entities;
+using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Entities.HolidayTracking.Transactions;
 using Infra.Repositories.Interfaces;
 using Service.DTOs.HolidayDTOs;
+using Service.HolidayServices.Earnings;
 
 namespace Service.HolidayServices;
 
@@ -14,7 +16,8 @@ public class HolidayBalanceService(
     IEarningRepo earningRepo,
     ITransactionRepo transactionRepo,
     IAccountRepo accountRepo,
-    WorkScheduleService workScheduleService)
+    WorkScheduleService workScheduleService,
+    EarningService earningService)
 {
     /*
      * This retrieves the account, its earnings and its transactions.
@@ -34,9 +37,17 @@ public class HolidayBalanceService(
         var account = await accountRepo.GetByIdAsync(accountId)
                       ?? throw new NotFoundException("Holiday account not found.");
 
-        var earnings = await earningRepo.GetEarningsByUserAndAccount(account.UserId, accountId);
+        return await CalculateBalance(account, date, includeUsedTransactions: true);
+    }
 
-        var transactions = await transactionRepo.GetByAccount(accountId);
+    private async Task<decimal> CalculateBalance(
+        HolidayAccount account,
+        DateOnly date,
+        bool includeUsedTransactions)
+    {
+        var earnings = await earningRepo.GetEarningsByUserAndAccount(account.UserId, account.Id);
+
+        var transactions = await transactionRepo.GetByAccount(account.Id);
 
         decimal balance = 0;
 
@@ -54,7 +65,7 @@ public class HolidayBalanceService(
                 continue;
             }
 
-            balance += CalculateRemainingHours(earning, transactions, date);
+            balance += CalculateRemainingHours(earning, transactions, date, includeUsedTransactions);
         }
 
         return decimal.Round(balance, 2);
@@ -100,12 +111,16 @@ public class HolidayBalanceService(
     private decimal CalculateRemainingHours(
         HolidayEarning earning,
         List<HolidayTransaction> transactions,
-        DateOnly date)
+        DateOnly date,
+        bool includeUsedTransactions)
     {
         var relatedTransactions = transactions.Where(t =>
             t.HolidayEarningId == earning.Id &&
             t.TransactionDate <= date &&
-            t.TransactionType != HolidayTransactionType.Earned);
+            t.TransactionType != HolidayTransactionType.Earned && 
+            (includeUsedTransactions ||
+             t.TransactionType != HolidayTransactionType.Used)
+            );
 
         var transactionHours = relatedTransactions.Sum(t => t.AmountHours);
 
@@ -168,7 +183,7 @@ public class HolidayBalanceService(
             {
                 Earning = e,
                 RemainingHours = CalculateRemainingHours(
-                    e, transactions, date)
+                    e, transactions, date, includeUsedTransactions: true)
             })
             .Where(x => x.RemainingHours > 0);
 
@@ -235,5 +250,51 @@ public class HolidayBalanceService(
             userId, date);
 
         return debtHours <= weeklyHours;
+    }
+    
+    public async Task<decimal> GetProjectedBalance(
+        Guid accountId,
+        DateOnly checkpoint)
+    {
+        if (accountId == Guid.Empty)
+            throw new ValidationException("Account id is required.");
+
+        var account = await accountRepo.GetByIdAsync(accountId)
+                      ?? throw new NotFoundException("Holiday account not found.");
+
+        // Calculate actual balance, excluding Used transactions.
+        var actualBalance = await CalculateBalance(
+            account,
+            checkpoint,
+            includeUsedTransactions: false
+        );
+
+        // Add earnings that have not yet been recorded.
+        var projectedEarnings = await earningService.CalculateProjectedEarnings(
+            account.UserId,
+            accountId,
+            checkpoint
+        );
+
+        return decimal.Round(actualBalance + projectedEarnings, 2);
+    }
+    
+    public async Task<decimal> GetUserProjectedBalance(
+        string userId,
+        DateOnly checkpoint)
+    {
+        var accounts = await accountRepo.GetUserAccountsAsync(userId);
+
+        decimal totalBalance = 0;
+
+        foreach (var account in accounts)
+        {
+            totalBalance += await GetProjectedBalance(
+                account.Id,
+                checkpoint
+            );
+        }
+
+        return decimal.Round(totalBalance, 2);
     }
 }
