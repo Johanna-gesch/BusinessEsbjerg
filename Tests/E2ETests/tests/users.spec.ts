@@ -21,10 +21,11 @@ test('Admin can create a user', async ({ page, helpers }) => {
 
     try {
 
-        await page.getByPlaceholder('username').fill(username);
-        await page.getByPlaceholder('password').fill('TestPassword123');
+        const createUserForm = page.getByTestId('create-user-form');
 
-        await page.getByRole('button', { name: 'Save' }).click();
+        await createUserForm.getByPlaceholder('username').fill(username);
+        await createUserForm.getByPlaceholder('password').fill('TestPassword123');
+        await createUserForm.getByRole('button', { name: 'Save' }).click();
 
         const createdUser = page.getByTestId('user-row')
             .filter({ hasText: username });
@@ -62,11 +63,11 @@ test('Admin can update a user', async ({ page, helpers }) => {
 
     try {
         // Arrange
+        const createUserForm = page.getByTestId('create-user-form');
 
-        await page.getByPlaceholder('username').fill(username);
-        await page.getByPlaceholder('password').fill('TestPassword123');
-
-        await page.getByRole('button', { name: 'Save' }).click();
+        await createUserForm.getByPlaceholder('username').fill(username);
+        await createUserForm.getByPlaceholder('password').fill('TestPassword123');
+        await createUserForm.getByRole('button', { name: 'Save' }).click();
 
         const rowBeforeEdit = page.getByTestId('user-row')
             .filter({ hasText: username });
@@ -126,10 +127,11 @@ test('Admin can delete a user', async ({ page, helpers }) => {
     try {
         // Arrange
         // Create a user for the delete test
-        await page.getByPlaceholder('username').fill(username);
-        await page.getByPlaceholder('password').fill('TestPassword123');
+        const createUserForm = page.getByTestId('create-user-form');
 
-        await page.getByRole('button', { name: 'Save' }).click();
+        await createUserForm.getByPlaceholder('username').fill(username);
+        await createUserForm.getByPlaceholder('password').fill('TestPassword123');
+        await createUserForm.getByRole('button', { name: 'Save' }).click();
 
         const userRow = page.getByTestId('user-row')
             .filter({ hasText: username });

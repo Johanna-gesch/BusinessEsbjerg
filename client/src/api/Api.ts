@@ -109,23 +109,6 @@ export interface UserEarningsDto {
   availableWeek6Hours: number;
 }
 
-export interface HolidayTransactionDto {
-  /** @format guid */
-  id: string;
-  /** @format guid */
-  holidayAccountId: string;
-  /** @format guid */
-  holidayEarningId?: string | null;
-  /** @format decimal */
-  availableWeek1_5Days: number;
-  /** @format decimal */
-  availableWeek6Days: number;
-  /** @format decimal */
-  availableWeek1_5Hours: number;
-  /** @format decimal */
-  availableWeek6Hours: number;
-}
-
 export interface HolidayRequest {
   /** @format guid */
   id: string;
@@ -258,11 +241,6 @@ export interface AccountGetAccountsForUserParams {
 
 export interface EarningGetEarningsForUserParams {
   userId?: string;
-}
-
-export interface TransactionGetTransactionHistoryParams {
-  /** @format guid */
-  accountId?: string;
 }
 
 export interface RequestCreateRequestParams {
@@ -684,11 +662,10 @@ export class Api<
      * @secure
      */
     requestGetRequestsForUser: (params: RequestParams = {}) =>
-      this.request<HolidayRequest[], any>({
+      this.request<Blob, any>({
         path: `/GetRequestsForUser`,
         method: "GET",
         secure: true,
-        format: "json",
         ...params,
       }),
   };
