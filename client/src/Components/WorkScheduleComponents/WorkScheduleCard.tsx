@@ -41,10 +41,13 @@ export function WorkScheduleCard({ userId }: Props) {
 
     const total = days.reduce((sum, day) => sum + schedule[day.key], 0);
     return (
-        <div>
-            <h2>Work Schedule</h2>
+        <section className="surface-card work-schedule-card">
+            <div className="section-heading">
+                <h2>Work Schedule</h2>
+                <span className="count-pill">{total} hours / week</span>
+            </div>
             <p>Effective from {new Date(schedule.effectiveFrom).toLocaleDateString("da-DK")}</p>
-            <table>
+            <table className="data-table schedule-table">
                 <tbody>
                 {days.map(day => (
                     <tr key={day.key}>
@@ -58,6 +61,6 @@ export function WorkScheduleCard({ userId }: Props) {
                 </tr>
                 </tbody>
             </table>
-        </div>
+        </section>
     );
 }

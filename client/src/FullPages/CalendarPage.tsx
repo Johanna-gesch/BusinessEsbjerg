@@ -6,14 +6,18 @@ export function CalendarPage() {
     const navigate = useNavigate();
 
     return (
-        <div>
-            <h1>Shared calendar</h1>
-
-            <button onClick={() => navigate ("/dashboard")}>
+        <main className="page-shell calendar-page">
+            <header className="page-header">
+                <div>
+                    <p className="eyebrow">People and time off</p>
+                    <h1>Shared calendar</h1>
+                </div>
+                <button className="button button-secondary" onClick={() => navigate ("/dashboard")}>
                 Back to Dashboard
-            </button>
+                </button>
+            </header>
 
             <SharedCalendar/>
-        </div>
+        </main>
     )
 }

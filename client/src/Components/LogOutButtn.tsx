@@ -13,7 +13,7 @@ export function LogOutButton() {
 
 
 return (
-    <button type="button" onClick={handleLogout}>
+    <button className="button button-quiet" type="button" onClick={handleLogout}>
         Log Out
     </button>
 );

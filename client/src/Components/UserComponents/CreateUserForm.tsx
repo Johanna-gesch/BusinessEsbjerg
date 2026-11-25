@@ -24,7 +24,16 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
 
             const updatedUsers = await MyApi.getUsers.userGetUsers();
 
-            setUsers(updatedUsers);
+            const newUser = updatedUsers.find(
+                user => user.username === usernameField
+            );
+
+            if (newUser) {
+                setUsers([
+                    newUser,
+                    ...updatedUsers.filter(user => user.userId !== newUser.userId)
+                ]);
+            }
 
             setUsernameField("");
             setPasswordField("");
@@ -36,21 +45,24 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
 
     return (
         <form
+            className="surface-card admin-form create-user-form"
             data-testid="create-user-form"
             onSubmit={e => {
                 e.preventDefault();
                 void handleCreateUser();
             }}
         >
-            Create User:
+            <h2>Create user</h2>
 
             <input
+                aria-label="Username"
                 placeholder="username"
                 value={usernameField}
                 onChange={e => setUsernameField(e.target.value)}
             />
 
             <input
+                aria-label="Password"
                 type="password"
                 placeholder="password"
                 value={passwordField}
@@ -66,7 +78,7 @@ export function CreateUserForm({setUsers}: CreateUserFormProps) {
                 <option value={UserRole.Accountant}>Accountant</option>
             </select>
 
-            <button type="submit">
+            <button className="button button-primary" type="submit">
                 Save
             </button>
         </form>
