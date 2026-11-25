@@ -54,6 +54,10 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          
+      - name: Install frontend dependencies
+        working-directory: client
+        run: bun install
 
       - name: Install dependencies
         working-directory: Tests/E2ETests
