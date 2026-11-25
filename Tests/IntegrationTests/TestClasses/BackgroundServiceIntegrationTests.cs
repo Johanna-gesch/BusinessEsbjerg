@@ -1,34 +1,35 @@
 ﻿
 using Infra.Entities;
+using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.IntegrationTests.TestClasses;
 
+[Collection("Integration tests")]
 public class BackgroundServiceIntegrationTests
-{
-    
-    
+{ 
+
     [Fact]
     public async Task BackgroundService_OnStartup_ProcessMonthlyEarnings()
     {
         string? createdUserId = null;
 
-        // Setup factory and helpers outside of the try block
-        // First factory: BackgroundService is disabled, so we can create our testdata
-        using var setupFactory = new CustomWebApplicationFactory();
-        using var setupClient = setupFactory.CreateClient();
+        List<HolidayAccount> accounts = new();
 
-        var helpers = new HelperMethods(setupFactory, setupClient);
-        
-        try
+        // ARRANGE
+        // First factory: BackgroundService is disabled.
+        using (var setupFactory = new CustomWebApplicationFactory())
+        using (var setupClient = setupFactory.CreateClient())
         {
-            // Arrange
-            var (userId, accounts) = await helpers.CreateUserWithAccounts();
+            var helpers = new HelperMethods(setupFactory, setupClient);
+
+            var (userId, createdAccounts) = await helpers.CreateUserWithAccounts();
 
             createdUserId = userId;
+            accounts = createdAccounts;
 
-            // Use previous completed month
+            // Use previous completed month.
             var today = DateOnly.FromDateTime(DateTime.Today);
             var monthStart = new DateOnly(today.Year, today.Month, 1).AddMonths(-1);
 
@@ -37,19 +38,19 @@ public class BackgroundServiceIntegrationTests
                 monthStart,
                 7.4m, 7.4m, 7.4m, 7.4m, 7.4m
             );
+        } // setupFactory and setupClient are disposed here.
 
-            var week1_5Account = accounts.Single(a => a.Type == HolidayType.Week1_5);
-            var week6Account = accounts.Single(a => a.Type == HolidayType.Week6);
-
+        try
+        {
+            // ACT
             // Second factory: BackgroundService is enabled.
             using var backgroundFactory = new BackgroundServiceWebApplicationFactory();
 
             using var backgroundClient = backgroundFactory.CreateClient();
 
-            // Act
+            var week1_5Account = accounts.Single(a => a.Type == HolidayType.Week1_5);
+            var week6Account = accounts.Single(a => a.Type == HolidayType.Week6);
 
-            // Starting the host starts the BackgroundService.
-            // It should now process the previous completed month.
             var timeout = DateTime.UtcNow.AddSeconds(30);
             bool earningsCreated = false;
 
@@ -60,12 +61,11 @@ public class BackgroundServiceIntegrationTests
                 var earningRepo = scope.ServiceProvider
                     .GetRequiredService<IEarningRepo>();
 
-                // Only check earnings for the test user
                 var week1_5Earnings = await earningRepo.GetEarningsByUserAndAccount(
-                    userId, week1_5Account.Id);
+                    createdUserId!, week1_5Account.Id);
 
                 var week6Earnings = await earningRepo.GetEarningsByUserAndAccount(
-                    userId, week6Account.Id);
+                    createdUserId!, week6Account.Id);
 
                 if (week1_5Earnings.Count == 1 && week6Earnings.Count == 1)
                 {
@@ -79,17 +79,17 @@ public class BackgroundServiceIntegrationTests
             Assert.True(earningsCreated,
                 "BackgroundService did not create earnings for the test user within 30 seconds.");
 
-            // Assert
-
+            // ASSERT
             using var assertScope = backgroundFactory.Services.CreateScope();
 
-            var assertRepo = assertScope.ServiceProvider.GetRequiredService<IEarningRepo>();
+            var assertRepo = assertScope.ServiceProvider
+                .GetRequiredService<IEarningRepo>();
 
             var finalWeek1_5Earnings = await assertRepo.GetEarningsByUserAndAccount(
-                userId, week1_5Account.Id);
+                createdUserId!, week1_5Account.Id);
 
             var finalWeek6Earnings = await assertRepo.GetEarningsByUserAndAccount(
-                userId, week6Account.Id);
+                createdUserId!, week6Account.Id);
 
             Assert.Single(finalWeek1_5Earnings);
             Assert.Single(finalWeek6Earnings);
@@ -99,11 +99,17 @@ public class BackgroundServiceIntegrationTests
         }
         finally
         {
-            //Cleanup
-            if (createdUserId != null) 
-                await helpers.RemoveUserWithAccountsAndSchedulesAndEarnings(createdUserId);
+            // CLEANUP
+            if (createdUserId != null)
+            {
+                // Use a fresh factory to access the database for cleanup.
+                using var cleanupFactory = new CustomWebApplicationFactory();
+                using var cleanupClient = cleanupFactory.CreateClient();
+
+                var cleanupHelpers = new HelperMethods(cleanupFactory, cleanupClient);
+
+                await cleanupHelpers.RemoveUserWithAccountsAndSchedulesAndEarnings(createdUserId);
+            }
         }
-        
-        
     }
 }

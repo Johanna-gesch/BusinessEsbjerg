@@ -6,6 +6,7 @@ import type {LoggedInUser} from "@/Interfaces/LoggedInUser.tsx";
 import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkScheduleCard.tsx";
 import apiClient from "@/services/ApiClient.ts";
 import {TransactionHistory} from "@/Components/TransactionHistory.tsx";
+import {EarningsComponent} from "@/Components/EarningsComponent/EarningsComponent.tsx";
 
 export function Dashboard() {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ export function Dashboard() {
 
     const [accounts, setAccounts] = useState<HolidayAccount []>([]);
     const [loadingAccounts, setLoadingAccounts] = useState(true);
-    const[accountsError, setAccountError] = useState("");
+    const [accountsError, setAccountError] = useState("");
 
     useEffect(() => {
         if (!user) return;
@@ -70,6 +71,8 @@ export function Dashboard() {
             </header>
 
             <WorkScheduleCard userId={user.userId} />
+
+            <EarningsComponent user={user} />
 
             <h2>Holiday transactions</h2>
 

@@ -13,6 +13,7 @@ using Service.Security;
 
 namespace Tests.IntegrationTests.TestClasses;
 
+[Collection("Integration tests")]
 public class AccountIntegrationTests
     : IClassFixture<CustomWebApplicationFactory>
 {

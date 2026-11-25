@@ -85,18 +85,24 @@ public class MySeeder(MyDatabaseConnection dc, IPasswordHasher hasher)
 
         const string username = "playwright_admin";
         const string password = "PlaywrightPassword123";
-        
-        if (!dc.Users.Any(u => u.Username == username))
+
+        var user = dc.Users.FirstOrDefault(u => u.Username == username);
+
+        if (user == null)
         {
-            dc.Insert(new User
+            user = new User
             {
                 UserId = Guid.NewGuid().ToString(),
                 Username = username,
                 PasswordHash = hasher.HashAndSaltPassword(password),
-                Role = 0,
+                Role = UserRole.Admin,
                 IsActive = true
-            });
+            };
+
+            dc.Insert(user);
         }
+
+        EnsureHolidayAccounts(user.UserId);
     }
     
     private void EnsureHolidayAccounts(string userId)

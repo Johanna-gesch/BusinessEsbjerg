@@ -662,11 +662,10 @@ export class Api<
      * @secure
      */
     requestGetRequestsForUser: (params: RequestParams = {}) =>
-      this.request<HolidayRequest[], any>({
+      this.request<Blob, any>({
         path: `/GetRequestsForUser`,
         method: "GET",
         secure: true,
-        format: "json",
         ...params,
       }),
   };
