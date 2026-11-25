@@ -41,15 +41,20 @@ export function AccountOverview(){
     const totalWeek6 = employees.reduce((sum, e) => sum + e.week6Hours, 0);
 
     return (
-        <section>
-            <h2>Holiday balances</h2>
+        <section className="surface-card account-overview">
+            <div className="section-heading">
+                <div>
+                    <p className="eyebrow">Team balances</p>
+                    <h2>Holiday balances</h2>
+                </div>
+            </div>
             <p>Hours available today.</p>
 
-            {loading && <p>Loading...</p>}
-            {error && <p>{error}</p>}
+            {loading && <p className="empty-state">Loading...</p>}
+            {error && <p className="form-message form-message-error">{error}</p>}
 
             {!loading && !error && (
-                <table>
+                <table className="data-table">
                     <thead>
                     <tr>
                         <th>Employee</th>

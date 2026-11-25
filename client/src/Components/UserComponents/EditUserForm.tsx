@@ -45,19 +45,12 @@ export function EditUserForm({ user, onClose, onUpdated }: EditUserProps) {
     }
 
     return (
-        <div style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000
-        }}>
-            <div>
+        <div className="modal-backdrop">
+            <div className="modal-card">
                 <h2>Edit User</h2>
 
                 <form
+                    className="edit-user-form"
                     data-testid={"edit-user-form"}
                     onSubmit={handleSaveUser}
                 >
@@ -94,11 +87,11 @@ export function EditUserForm({ user, onClose, onUpdated }: EditUserProps) {
                     </div>
 
                     <div>
-                        <button type="button" onClick={onClose}>
+                        <button className="button button-secondary" type="button" onClick={onClose}>
                             Cancel
                         </button>
 
-                        <button type="submit">
+                        <button className="button button-primary" type="submit">
                             Save
                         </button>
                     </div>
