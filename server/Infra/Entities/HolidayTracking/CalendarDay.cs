@@ -7,6 +7,6 @@ public class CalendarDay
 {
     [PrimaryKey] public Guid Id { get; set;}
     [Column] public DateOnly Date { get; set;}
-    [Column] public string Name { get; set;}
+    [Column] public string Name { get; set; } = "";
 
 }
