@@ -51,10 +51,13 @@ export interface HolidayEarning {
   id: string;
   /** @format guid */
   holidayAccountId: string;
+  userId: string;
   /** @format date */
   earnedDate: string;
   /** @format decimal */
   earnedHours: number;
+  /** @format decimal */
+  earnedDays: number;
   /** @format date */
   expiryDate: string;
 }
@@ -86,6 +89,17 @@ export interface CreateCalendarDayDTO {
   /** @format date */
   date: string;
   name: string;
+}
+
+export interface UserEarningsDto {
+  /** @format decimal */
+  availableWeek1_5Days: number;
+  /** @format decimal */
+  availableWeek6Days: number;
+  /** @format decimal */
+  availableWeek1_5Hours: number;
+  /** @format decimal */
+  availableWeek6Hours: number;
 }
 
 export interface HolidayTransactionDto {
@@ -177,6 +191,10 @@ export interface AccountGetAccountByIdParams {
 }
 
 export interface AccountGetAccountsForUserParams {
+  userId?: string;
+}
+
+export interface EarningGetEarningsForUserParams {
   userId?: string;
 }
 
@@ -538,6 +556,28 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  getEarningsForUser = {
+    /**
+     * No description
+     *
+     * @tags Earning
+     * @name EarningGetEarningsForUser
+     * @request GET:/GetEarningsForUser
+     * @secure
+     */
+    earningGetEarningsForUser: (
+      query: EarningGetEarningsForUserParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<UserEarningsDto, any>({
+        path: `/GetEarningsForUser`,
+        method: "GET",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

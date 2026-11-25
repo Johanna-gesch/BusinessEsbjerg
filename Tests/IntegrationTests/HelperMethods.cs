@@ -47,6 +47,7 @@ public class HelperMethods
 
         var repo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
         var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        var accountRepo = scope.ServiceProvider.GetRequiredService<IAccountRepo>();
 
         var admin = await repo.GetByUsername(username);
 
@@ -57,10 +58,36 @@ public class HelperMethods
                 UserId = Guid.NewGuid().ToString(),
                 Username = username,
                 PasswordHash = hasher.HashAndSaltPassword(password),
-                Role = UserRole.Admin
+                Role = UserRole.Admin,
+                IsActive = true
             };
 
             await repo.Insert(admin);
+        }
+        
+        // Get existing accounts for the admin
+        var accounts = await accountRepo.GetUserAccountsAsync(admin.UserId);
+        
+        // Ensure Week1_5 account exists
+        if (!accounts.Any(a => a.Type == HolidayType.Week1_5))
+        {
+            await accountRepo.InsertAsync(new HolidayAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = admin.UserId,
+                Type = HolidayType.Week1_5
+            });
+        }
+
+        // Ensure Week6 account exists
+        if (!accounts.Any(a => a.Type == HolidayType.Week6))
+        {
+            await accountRepo.InsertAsync(new HolidayAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = admin.UserId,
+                Type = HolidayType.Week6
+            });
         }
 
         var loginResponse = await _client.PostAsJsonAsync(

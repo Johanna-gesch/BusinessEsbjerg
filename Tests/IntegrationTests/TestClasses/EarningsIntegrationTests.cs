@@ -6,6 +6,7 @@ using Service.HolidayServices.Earnings;
 
 namespace Tests.IntegrationTests.TestClasses;
 
+[Collection("Integration tests")]
 public class EarningsIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;

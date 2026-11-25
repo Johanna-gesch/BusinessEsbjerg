@@ -49,14 +49,7 @@ app.UseSwaggerUi();
 
 
 
-if (app.Environment.IsEnvironment("Testing"))
-{
-    using var scope = app.Services.CreateScope();
-
-    var seeder = scope.ServiceProvider.GetRequiredService<MySeeder>();
-    seeder.SeedForTests();
-}
-else
+if (!app.Environment.IsEnvironment("Testing"))
 {
     using var scope = app.Services.CreateScope();
 
