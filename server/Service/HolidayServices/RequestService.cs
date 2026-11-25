@@ -14,17 +14,19 @@ public class RequestService(
     ITransactionRepo transactionRepo,
     IUnitOfWork unitOfWork)
 {
-    public async Task<List<HolidayRequest>> GetAllRequests()
+    public async Task<List<HolidayRequestDto>> GetAllRequests()
     {
-        return await repo.GetAll();
+        var requests = await repo.GetAll();
+        return requests.Select(ToDto).ToList();
     }
 
-    public async Task<List<HolidayRequest>> GetRequestsForUser(string userId)
+    public async Task<List<HolidayRequestDto>> GetRequestsForUser(string userId)
     {
         if (string.IsNullOrWhiteSpace(userId))
             throw new ValidationException("User id is required.");
 
-        return await repo.GetByUserId(userId);
+        var requests = await repo.GetByUserId(userId);
+        return requests.Select(ToDto).ToList();
     }
 
     public async Task<HolidayRequest> GetById(Guid id)
@@ -62,6 +64,17 @@ public class RequestService(
 
         await repo.Insert(request);
     }
+    
+    private static HolidayRequestDto ToDto(HolidayRequest request) => new()
+    {
+        Id = request.Id,
+        UserId = request.UserId,
+        CreatedAt = request.CreatedAt,
+        StartDate = request.StartDate,
+        EndDate = request.EndDate,
+        Status = request.Status,
+        RejectionReason = request.RejectionReason
+    };
 
     private async Task<bool> IsOverlapAsync(string userId, DateOnly startDate, DateOnly endDate)
     {

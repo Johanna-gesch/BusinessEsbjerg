@@ -10,17 +10,17 @@
  * ---------------------------------------------------------------
  */
 
+export enum UserRole {
+  User = 0,
+  Admin = 1,
+  Accountant = 2,
+}
+
 export enum SharedCalendarDayStatus {
   Off = 0,
   Working = 1,
   Holiday = 2,
   PublicHoliday = 3,
-}
-
-export enum UserRole {
-  User = 0,
-  Admin = 1,
-  Accountant = 2,
 }
 
 export enum HolidayRequestStatus {
@@ -120,33 +120,18 @@ export interface UserEarningsDto {
   availableWeek6Hours: number;
 }
 
-export interface HolidayRequest {
+export interface HolidayRequestDto {
   /** @format guid */
   id: string;
   userId: string;
   /** @format date-time */
   createdAt: string;
-  cancellationReason?: string | null;
   /** @format date */
   startDate: string;
   /** @format date */
   endDate: string;
   status: HolidayRequestStatus;
-  approvedByUserId?: string | null;
-  /** @format date-time */
-  approvedAt?: string | null;
   rejectionReason?: string | null;
-  user: User;
-}
-
-export interface User {
-  userId: string;
-  username: string;
-  passwordHash: string;
-  role: UserRole;
-  isActive: boolean;
-  holidayAccounts: HolidayAccount[];
-  holidayRequests: HolidayRequest[];
 }
 
 export interface CreateRequestDto {
@@ -200,6 +185,35 @@ export interface CreateUserDto {
   username: string;
   password: string;
   role: UserRole;
+}
+
+export interface User {
+  userId: string;
+  username: string;
+  passwordHash: string;
+  role: UserRole;
+  isActive: boolean;
+  holidayAccounts: HolidayAccount[];
+  holidayRequests: HolidayRequest[];
+}
+
+export interface HolidayRequest {
+  /** @format guid */
+  id: string;
+  userId: string;
+  /** @format date-time */
+  createdAt: string;
+  cancellationReason?: string | null;
+  /** @format date */
+  startDate: string;
+  /** @format date */
+  endDate: string;
+  status: HolidayRequestStatus;
+  approvedByUserId?: string | null;
+  /** @format date-time */
+  approvedAt?: string | null;
+  rejectionReason?: string | null;
+  user: User;
 }
 
 export interface UpdateUserDto {
@@ -707,7 +721,7 @@ export class Api<
      * @secure
      */
     requestGetAllRequests: (params: RequestParams = {}) =>
-      this.request<HolidayRequest[], any>({
+      this.request<HolidayRequestDto[], any>({
         path: `/GetAllRequests`,
         method: "GET",
         secure: true,
@@ -725,7 +739,7 @@ export class Api<
      * @secure
      */
     requestGetRequestsForUser: (params: RequestParams = {}) =>
-      this.request<HolidayRequest[], any>({
+      this.request<HolidayRequestDto[], any>({
         path: `/GetRequestsForUser`,
         method: "GET",
         secure: true,
