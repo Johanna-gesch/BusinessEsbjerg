@@ -17,7 +17,7 @@ public class RequestController(RequestService requestService) : ControllerBase
     }
 
     [HttpGet(nameof(GetRequestsForUser))]
-    public async Task<IActionResult> GetRequestsForUser()
+    public async Task<ActionResult<List<HolidayRequest>>> GetRequestsForUser()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -30,7 +30,7 @@ public class RequestController(RequestService requestService) : ControllerBase
     }
     
     [HttpPost(nameof(CreateRequest))]
-    public async Task<IActionResult> CreateRequest(CreateRequestDto dto)
+    public async Task<IActionResult> CreateRequest([FromBody] CreateRequestDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -51,6 +51,7 @@ public class RequestController(RequestService requestService) : ControllerBase
         return NoContent();
     }
 
+    [HttpPut(nameof(CancelRequest))]
     public async Task<IActionResult> CancelRequest(Guid requestId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
