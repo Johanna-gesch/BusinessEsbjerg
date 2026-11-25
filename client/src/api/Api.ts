@@ -149,6 +149,13 @@ export interface User {
   holidayRequests: HolidayRequest[];
 }
 
+export interface CreateRequestDto {
+  /** @format date */
+  startDate: string;
+  /** @format date */
+  endDate: string;
+}
+
 export interface SharedCalendarEmployeeDto {
   userId: string;
   username: string;
@@ -250,21 +257,26 @@ export interface AccountGetAccountsForUserParams {
   userId?: string;
 }
 
-export interface EarningGetEarningsForUserParams {
-  userId?: string;
+export interface AccountGetAvailableBalanceParams {
+  /** @format guid */
+  accountId?: string;
+  /** @format date */
+  date?: string;
 }
 
-export interface RequestCreateRequestParams {
-  /** @format date */
-  StartDate?: string;
-  /** @format date */
-  EndDate?: string;
+export interface EarningGetEarningsForUserParams {
+  userId?: string;
 }
 
 export interface RequestUpdateRequestStatusParams {
   /** @format guid */
   requestId?: string;
   status?: HolidayRequestStatus;
+}
+
+export interface RequestCancelRequestParams {
+  /** @format guid */
+  requestId?: string;
 }
 
 export interface SharedCalendarGetSharedCalendarParams {
@@ -618,6 +630,28 @@ export class Api<
         ...params,
       }),
   };
+  getAvailableBalance = {
+    /**
+     * No description
+     *
+     * @tags Account
+     * @name AccountGetAvailableBalance
+     * @request GET:/GetAvailableBalance
+     * @secure
+     */
+    accountGetAvailableBalance: (
+      query: AccountGetAvailableBalanceParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<number, any>({
+        path: `/GetAvailableBalance`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
   createCalendarDay = {
     /**
      * No description
@@ -691,10 +725,11 @@ export class Api<
      * @secure
      */
     requestGetRequestsForUser: (params: RequestParams = {}) =>
-      this.request<Blob, any>({
+      this.request<HolidayRequest[], any>({
         path: `/GetRequestsForUser`,
         method: "GET",
         secure: true,
+        format: "json",
         ...params,
       }),
   };
@@ -708,14 +743,15 @@ export class Api<
      * @secure
      */
     requestCreateRequest: (
-      query: RequestCreateRequestParams = {},
+      data: CreateRequestDto,
       params: RequestParams = {},
     ) =>
       this.request<Blob, any>({
         path: `/CreateRequest`,
         method: "POST",
-        query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         ...params,
       }),
   };
@@ -734,6 +770,27 @@ export class Api<
     ) =>
       this.request<Blob, any>({
         path: `/UpdateRequestStatus`,
+        method: "PUT",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+  };
+  cancelRequest = {
+    /**
+     * No description
+     *
+     * @tags Request
+     * @name RequestCancelRequest
+     * @request PUT:/CancelRequest
+     * @secure
+     */
+    requestCancelRequest: (
+      query: RequestCancelRequestParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<Blob, any>({
+        path: `/CancelRequest`,
         method: "PUT",
         query: query,
         secure: true,
