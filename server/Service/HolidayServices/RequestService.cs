@@ -26,7 +26,7 @@ public class RequestService(
 
         return await repo.GetByUserId(userId);
     }
-    
+
     public async Task<HolidayRequest> GetById(Guid id)
     {
         if (id == Guid.Empty)
@@ -35,7 +35,7 @@ public class RequestService(
         return await repo.GetById(id) ??
                throw new NotFoundException($"Request with this Id {id} is not found.");
     }
-    
+
     public async Task CreateRequestAsync(CreateRequestDto dto, string userId)
     {
         if (dto.StartDate > dto.EndDate)
@@ -44,11 +44,11 @@ public class RequestService(
 
         if (string.IsNullOrWhiteSpace(userId))
             throw new ValidationException("User id is required.");
-        
+
         if (await IsOverlapAsync(userId, dto.StartDate, dto.EndDate))
             throw new ValidationException(
                 "There is overlap with another one of your requests.");
-        
+
 
         var request = new HolidayRequest
         {
@@ -79,7 +79,6 @@ public class RequestService(
         if (status != HolidayRequestStatus.Approved &&
             status != HolidayRequestStatus.Rejected)
             throw new ValidationException("Admins can only approve or reject requests.");
-        
 
         var request = await GetById(requestId);
 
@@ -95,15 +94,15 @@ public class RequestService(
 
         await ApproveRequestAsync(request);
     }
-    
+
     private async Task ApproveRequestAsync(HolidayRequest request)
     {
         var calculationDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        
+
         var publicHolidays = await calendarDayService.GetHolidayDates(
             request.StartDate,
             request.EndDate);
-        
+
         var requiredHours = await workScheduleService.CalculateRequiredHours(
             request.UserId,
             request.StartDate,
@@ -119,16 +118,16 @@ public class RequestService(
             requiredHours - balance.TotalHours);
 
         if (!await holidayBalanceService.IsDebtAllowed(
-                request.UserId, 
-                debtHours, 
+                request.UserId,
+                debtHours,
                 request.StartDate))
         {
             throw new ValidationException(
                 "The request exceeds the permitted holiday debt.");
         }
 
-        // August 31 projected balance validation goes here.
-        
+        await ValidateAugust31Balances(request);
+
         var hoursToAllocate = Math.Min(requiredHours, balance.TotalHours);
 
         var transactions = hoursToAllocate > 0
@@ -172,5 +171,97 @@ public class RequestService(
         request.Status = HolidayRequestStatus.Cancelled;
 
         await repo.Update(request);
+    }
+
+    private async Task ValidateAugust31Balances(
+        HolidayRequest currentRequest)
+    {
+        var requests = await repo.GetByUserId(currentRequest.UserId);
+
+        // Include approved requests, but exclude the current request
+        // so that we can add it exactly once below.
+        var qualifyingRequests = requests
+            .Where(r =>
+                r.Id != currentRequest.Id &&
+                r.Status == HolidayRequestStatus.Approved)
+            .ToList();
+
+        // The request currently being reviewed must also count.
+        qualifyingRequests.Add(currentRequest);
+
+        // Determine the first and last holiday years affected.
+        // A holiday year runs from September 1 to August 31.
+        int firstCheckpointYear =
+            currentRequest.StartDate.Month >= 9
+                ? currentRequest.StartDate.Year + 1
+                : currentRequest.StartDate.Year;
+
+        int lastCheckpointYear =
+            currentRequest.EndDate.Month >= 9
+                ? currentRequest.EndDate.Year + 1
+                : currentRequest.EndDate.Year;
+
+        for (int year = firstCheckpointYear;
+             year <= lastCheckpointYear;
+             year++)
+        {
+            var checkpoint = new DateOnly(year, 8, 31);
+
+            var holidayYearStart = new DateOnly(year - 1, 9, 1);
+
+            // Calculate the projected balance before holiday usage.
+            var projectedBalance =
+                await holidayBalanceService.GetUserProjectedBalance(
+                    currentRequest.UserId,
+                    checkpoint
+                );
+
+            decimal approvedHolidayHours = 0;
+
+            foreach (var request in qualifyingRequests)
+            {
+                // Find the part of this request that belongs to
+                // the holiday year being checked.
+                var periodStart = request.StartDate < holidayYearStart
+                    ? holidayYearStart
+                    : request.StartDate;
+
+                var periodEnd = request.EndDate > checkpoint
+                    ? checkpoint
+                    : request.EndDate;
+
+                // This request does not overlap the holiday year.
+                if (periodStart > periodEnd)
+                    continue;
+
+                var publicHolidays =
+                    await calendarDayService.GetHolidayDates(
+                        periodStart,
+                        periodEnd
+                    );
+
+                var requiredHours =
+                    await workScheduleService.CalculateRequiredHours(
+                        request.UserId,
+                        periodStart,
+                        periodEnd,
+                        publicHolidays
+                    );
+
+                approvedHolidayHours += requiredHours;
+            }
+
+            var remainingBalance =
+                projectedBalance - approvedHolidayHours;
+
+            if (remainingBalance < 0)
+            {
+                throw new ValidationException(
+                    $"Approving this request would result in a negative " +
+                    $"holiday balance on August 31, {year}. " +
+                    $"Projected balance: {remainingBalance:F2} hours."
+                );
+            }
+        }
     }
 }

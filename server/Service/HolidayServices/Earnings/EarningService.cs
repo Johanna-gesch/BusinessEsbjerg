@@ -1,9 +1,8 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-using Infra.Entities;
+﻿using Infra.Entities;
 using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Repositories.Interfaces;
 using Service.DTOs.HolidayDTOs;
+using ValidationException = Infra.ValidationException;
 
 namespace Service.HolidayServices.Earnings;
 
@@ -32,12 +31,10 @@ public class EarningService(
 
         var accounts = await accountRepo.GetUserAccountsAsync(userId);
 
-        var week1_5 = accounts.SingleOrDefault(
-            a => a.Type == HolidayType.Week1_5
+        var week1_5 = accounts.SingleOrDefault(a => a.Type == HolidayType.Week1_5
         ) ?? throw new ValidationException("Week1_5 account not found");
 
-        var week6 = accounts.SingleOrDefault(
-            a => a.Type == HolidayType.Week6
+        var week6 = accounts.SingleOrDefault(a => a.Type == HolidayType.Week6
         ) ?? throw new ValidationException("Week6 account not found");
 
         var schedules = await workScheduleRepo.GetHistoryForUser(userId);
@@ -54,7 +51,7 @@ public class EarningService(
             monthStart,
             monthEnd
         );
-        
+
         var earningsToSave = new List<HolidayEarning>();
 
         // Week 1-5
@@ -92,9 +89,8 @@ public class EarningService(
         {
             await earningRepo.SaveEarningsTransaction(earningsToSave);
         }
-
     }
-    
+
     /**
      * Finds all users, finds the first workschedule for the user
      * and starts controlling if there are already saved earnings from that month.
@@ -115,7 +111,6 @@ public class EarningService(
 
         foreach (var user in users)
         {
-            
             cancellationToken.ThrowIfCancellationRequested();
 
             var schedules = await workScheduleRepo.GetHistoryForUser(
@@ -136,7 +131,6 @@ public class EarningService(
 
             while (monthStart <= lastCompletedMonth)
             {
-                
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var monthEnd = monthStart.AddMonths(1).AddDays(-1);
@@ -151,7 +145,7 @@ public class EarningService(
             }
         }
     }
-    
+
     public async Task<UserEarningsDto> GetEarningsByUser(string userId)
     {
         var accounts = await accountRepo.GetUserAccountsAsync(userId);
@@ -213,5 +207,75 @@ public class EarningService(
         int expiryYear = earnedDate.Year + 2;
 
         return new DateOnly(expiryYear, 4, 30);
+    }
+
+    public async Task<decimal> CalculateProjectedEarnings(
+        string userId,
+        Guid accountId,
+        DateOnly checkpoint)
+    {
+        var accounts = await accountRepo.GetUserAccountsAsync(userId);
+
+        var account = accounts.SingleOrDefault(a => a.Id == accountId)
+                      ?? throw new ValidationException("Holiday account not found.");
+
+        var schedules = await workScheduleRepo.GetHistoryForUser(userId);
+
+        if (schedules.Count == 0)
+            throw new ValidationException("No work schedule history found.");
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        // Actual earnings before the current month are already
+        // included in the employee's actual balance.
+        var monthStart = new DateOnly(today.Year, today.Month, 1);
+
+        if (checkpoint < monthStart)
+            return 0;
+
+        decimal projectedHours = 0;
+
+        while (monthStart <= checkpoint)
+        {
+            // Do not project earnings that have already been recorded.
+            if (!await earningRepo.EarningsExist(accountId, monthStart))
+            {
+                var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+                var result = earningCalculator.CalculateMonthlyEarnings(
+                    schedules,
+                    monthStart,
+                    monthEnd
+                );
+
+                decimal earnedHours = account.Type switch
+                {
+                    HolidayType.Week1_5 => result.Week1_5Hours,
+                    HolidayType.Week6 => result.Week6Hours,
+                    _ => throw new ValidationException("Invalid holiday account type.")
+                };
+
+                var expiryDate = account.Type switch
+                {
+                    HolidayType.Week1_5 => CalculateWeek1_5ExpiryDate(monthStart),
+                    HolidayType.Week6 => CalculateWeek6ExpiryDate(monthStart),
+                    _ => throw new ValidationException("Invalid holiday account type.")
+                };
+
+                // Only include earnings that are usable and not expired
+                // on the checkpoint date.
+                bool availableOnCheckpoint =
+                    expiryDate >= checkpoint &&
+                    (account.Type != HolidayType.Week6 ||
+                     checkpoint >= new DateOnly(monthStart.Year + 1, 5, 1));
+
+                if (availableOnCheckpoint)
+                    projectedHours += earnedHours;
+            }
+
+            monthStart = monthStart.AddMonths(1);
+        }
+
+        return decimal.Round(projectedHours, 2);
     }
 }
