@@ -3,9 +3,10 @@ import { TransactionHistory } from "@/Components/TransactionHistory.tsx";
 
 type AccountCardProps = {
     account: HolidayAccount;
+    userId: string;
 };
 
-export function AccountCard({ account }: AccountCardProps) {
+export function AccountCard({ account, userId}: AccountCardProps) {
 
     const accountTitle = account.type === 0
         ? "First five holiday weeks"
@@ -21,7 +22,11 @@ export function AccountCard({ account }: AccountCardProps) {
                     : "Your additional sixth holiday week account."}
             </p>
 
-            <TransactionHistory accountId={account.id} />
+            <TransactionHistory
+                accountId={account.id}
+                userId={userId}
+                accountType={account.type}
+            />
         </article>
     );
 }
