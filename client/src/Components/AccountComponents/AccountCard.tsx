@@ -1,10 +1,11 @@
-import type {HolidayAccount} from "@/api/Api.ts";
+import type { HolidayAccount } from "@/api/Api.ts";
+import { TransactionHistory } from "@/Components/TransactionHistory.tsx";
 
 type AccountCardProps = {
     account: HolidayAccount;
 };
 
-export function AccountCard({ account}: AccountCardProps){
+export function AccountCard({ account }: AccountCardProps) {
 
     const accountTitle = account.type === 0
         ? "First five holiday weeks"
@@ -19,6 +20,8 @@ export function AccountCard({ account}: AccountCardProps){
                     ? "Your ordinary holiday account."
                     : "Your additional sixth holiday week account."}
             </p>
+
+            <TransactionHistory accountId={account.id} />
         </div>
     );
 }

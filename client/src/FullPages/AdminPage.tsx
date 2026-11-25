@@ -2,7 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import type {User} from "@/api/Api.ts";
 import apiClient from "@/services/ApiClient.ts";
-import {UserList} from "@/Components/UserList.tsx";
+import {UserList} from "@/Components/UserComponents/UserList.tsx";
 import {CreateUserForm} from "@/Components/UserComponents/CreateUserForm.tsx";
 import {CreateWorkScheduleForm} from "@/Components/WorkScheduleComponents/CreateWorkScheduleForm.tsx";
 import {CreateCalendarDayForm} from "@/Components/CalendarComponents/CreateCalendarDayForm.tsx";

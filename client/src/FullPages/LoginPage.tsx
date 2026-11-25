@@ -16,7 +16,6 @@ export default function LoginPage() {
         setError("");
 
         try {
-
             const response = await apiClient.api.login.userLogin({ username, password });
             const token = response.token;
 

@@ -2,7 +2,7 @@
 import apiClient from "@/services/ApiClient.ts";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import type { User } from "@/api/Api.ts";
-import { EditUserForm } from "./UserComponents/EditUserForm.tsx";
+import { EditUserForm } from "./EditUserForm.tsx";
 
 const MyApi = apiClient.api;
 
