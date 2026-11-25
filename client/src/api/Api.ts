@@ -250,6 +250,13 @@ export interface AccountGetAccountsForUserParams {
   userId?: string;
 }
 
+export interface AccountGetAvailableBalanceParams {
+  /** @format guid */
+  accountId?: string;
+  /** @format date */
+  date?: string;
+}
+
 export interface EarningGetEarningsForUserParams {
   userId?: string;
 }
@@ -613,6 +620,28 @@ export class Api<
       this.request<EmployeebalanceDto[], any>({
         path: `/GetAccountOverview`,
         method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getAvailableBalance = {
+    /**
+     * No description
+     *
+     * @tags Account
+     * @name AccountGetAvailableBalance
+     * @request GET:/GetAvailableBalance
+     * @secure
+     */
+    accountGetAvailableBalance: (
+      query: AccountGetAvailableBalanceParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<number, any>({
+        path: `/GetAvailableBalance`,
+        method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
