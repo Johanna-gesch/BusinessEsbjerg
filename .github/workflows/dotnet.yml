@@ -61,3 +61,6 @@ jobs:
       - name: Run Playwright tests
         working-directory: Tests/E2ETests
         run: npx playwright test
+        env:
+          JwtSecret: ${{ secrets.jwtSecret }}
+          TEST_DB: ${{ secrets.TEST_DB }}
