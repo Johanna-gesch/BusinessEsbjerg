@@ -16,7 +16,7 @@ public class WorkScheduleServiceTests
         _service = new WorkScheduleService(_repoStub, _userRepoStub);
         
         //current workweek from 1. sept 2026
-        _repoStub.Current.Add(new WorkSchedule
+        _repoStub.History.Add(new WorkScheduleHistory()
         {
             Id = Guid.NewGuid(),UserId = "Malthe", EffectiveFrom = new DateOnly(2026, 9, 1),
             MondayHours = 7.5m, TuesdayHours = 7.5m, WednesdayHours = 7.5m,

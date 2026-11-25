@@ -84,6 +84,17 @@ export interface HolidayTransaction {
   description?: string | null;
 }
 
+export interface EmployeebalanceDto {
+  userId: string;
+  username: string;
+  /** @format decimal */
+  week1_5Hours: number;
+  /** @format decimal */
+  week6Hours: number;
+  /** @format decimal */
+  totalHours: number;
+}
+
 export interface CalendarDayDTO {
   /** @format guid */
   id: string;
@@ -584,6 +595,24 @@ export class Api<
         path: `/GetAccountsForUser`,
         method: "GET",
         query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  getAccountOverview = {
+    /**
+     * No description
+     *
+     * @tags Account
+     * @name AccountGetAccountOverview
+     * @request GET:/GetAccountOverview
+     * @secure
+     */
+    accountGetAccountOverview: (params: RequestParams = {}) =>
+      this.request<EmployeebalanceDto[], any>({
+        path: `/GetAccountOverview`,
+        method: "GET",
         secure: true,
         format: "json",
         ...params,
