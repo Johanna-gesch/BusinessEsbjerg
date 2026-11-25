@@ -33,6 +33,8 @@ public static class AuthenticationExtensions
         services.AddScoped<WorkScheduleService>();
         
         services.AddScoped<AccountOverviewService>();
+        services.AddScoped<IAccountOverviewRepo, AccountOverviewRepo>();
+        
         services.AddScoped<AccountService>();
         services.AddScoped<IAccountRepo, AccountRepo>();
         
