@@ -12,6 +12,7 @@ import {AdminPage} from "@/FullPages/AdminPage.tsx";
 import LoginPage from "@/FullPages/LoginPage.tsx";
 import {Dashboard} from "@/FullPages/Dashboard.tsx";
 import {CalendarPage} from "@/FullPages/CalendarPage.tsx";
+import {AccountantPage} from "@/FullPages/AccountantPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -25,6 +26,9 @@ const router = createBrowserRouter([
     },
     {
         path: "/sharedcalendar", element: <CalendarPage/>
+    },
+    {
+        path: "/accountant", element: <AccountantPage/>
     }
 ]);
 

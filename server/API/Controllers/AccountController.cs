@@ -1,13 +1,16 @@
-﻿using Infra.Entities.HolidayTracking.Accounts;
+﻿using System.Security.Claims;
+using Infra.Entities.HolidayTracking.Accounts;
+using Infra.Entities.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Service.DTOs;
 using Service.DTOs.HolidayDTOs;
 using Service.HolidayServices;
 
 namespace API.Controllers;
 
 [ApiController]
-public class AccountController(AccountService service) : ControllerBase
+public class AccountController(AccountService service, AccountOverviewService overviewService) : ControllerBase
 {
     [Authorize]
     [HttpGet(nameof(GetAccountById))]
@@ -24,5 +27,14 @@ public class AccountController(AccountService service) : ControllerBase
         var accounts = await service.GetAccountsForUserAsync(userId);
 
         return Ok(accounts);
+    }
+
+    [Authorize(Roles = "Accountant")]
+    [HttpGet(nameof(GetAccountOverview))]
+    public async Task<ActionResult<List<EmployeebalanceDto>>> GetAccountOverview()
+    {
+        var overview = await overviewService.GetOverview(DateOnly.FromDateTime(DateTime.Today));
+        return Ok(overview);
+
     }
 }

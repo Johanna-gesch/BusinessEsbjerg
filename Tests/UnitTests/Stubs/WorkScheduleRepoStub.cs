@@ -30,6 +30,11 @@ public class WorkScheduleRepoStub : IWorkScheduleRepo
             .ToList());
     }
 
+    public Task<List<WorkScheduleHistory>> GetSchedulesForPeriod(string userId, DateOnly start, DateOnly end)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task Insert(WorkScheduleHistory schedule)
     {
         throw new NotImplementedException();
