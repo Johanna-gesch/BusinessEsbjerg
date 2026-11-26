@@ -1,10 +1,7 @@
-﻿using System.Security.Claims;
-using Infra.Entities.HolidayTracking.Accounts;
-using Infra.Entities.Users;
+﻿using Infra.Entities.HolidayTracking.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTOs;
-using Service.DTOs.HolidayDTOs;
 using Service.HolidayServices;
 
 namespace API.Controllers;

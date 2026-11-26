@@ -10,14 +10,16 @@ namespace API.Controllers;
 
 public class RequestController(RequestService requestService) : ControllerBase
 {
+    [Authorize(Roles = nameof(UserRole.Accountant))]
     [HttpGet(nameof(GetAllRequests))]
-    public async Task<List<HolidayRequest>> GetAllRequests()
+    public async Task<ActionResult<List<HolidayRequestDto>>> GetAllRequests()
     {
-        return await requestService.GetAllRequests();
+        return Ok(await requestService.GetAllRequests());
     }
 
+    [Authorize]
     [HttpGet(nameof(GetRequestsForUser))]
-    public async Task<ActionResult<List<HolidayRequest>>> GetRequestsForUser()
+    public async Task<ActionResult<List<HolidayRequestDto>>> GetRequestsForUser()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -25,7 +27,6 @@ public class RequestController(RequestService requestService) : ControllerBase
             return Unauthorized();
 
         var requests = await requestService.GetRequestsForUser(userId);
-
         return Ok(requests);
     }
     
@@ -44,10 +45,10 @@ public class RequestController(RequestService requestService) : ControllerBase
 
     [Authorize(Roles = nameof(UserRole.Accountant))]
     [HttpPut(nameof(UpdateRequestStatus))]
-    public async Task<IActionResult> UpdateRequestStatus(Guid requestId, HolidayRequestStatus status)
+    public async Task<IActionResult> UpdateRequestStatus(
+        Guid requestId, HolidayRequestStatus status, string? rejectionReason = null)
     {
-        await requestService.UpdateRequestStatusAsync(requestId, status);
-
+        await requestService.UpdateRequestStatusAsync(requestId, status, rejectionReason);
         return NoContent();
     }
 

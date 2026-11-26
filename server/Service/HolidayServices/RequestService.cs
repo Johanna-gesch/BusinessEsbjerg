@@ -12,19 +12,35 @@ public class RequestService(
     HolidayBalanceService holidayBalanceService,
     CalendarDayService calendarDayService,
     ITransactionRepo transactionRepo,
+    IUserRepo userRepo,
     IUnitOfWork unitOfWork)
 {
-    public async Task<List<HolidayRequest>> GetAllRequests()
+    private const int MaxRejectionReasonLength = 255;
+    
+    public async Task<List<HolidayRequestDto>> GetAllRequests()
     {
-        return await repo.GetAll();
+        var requests = await repo.GetAll();
+
+        // One query for all users, then look the name up in memory
+        var usernames = (await userRepo.GetAll())
+            .ToDictionary(u => u.UserId, u => u.Username);
+
+        return requests
+            .OrderBy(r => r.Status == HolidayRequestStatus.Pending ? 0 : 1)
+            .ThenByDescending(r => r.CreatedAt)
+            .Select(r => ToDto(r, usernames.GetValueOrDefault(r.UserId, "Unknown")))
+            .ToList();
     }
 
-    public async Task<List<HolidayRequest>> GetRequestsForUser(string userId)
+    public async Task<List<HolidayRequestDto>> GetRequestsForUser(string userId)
     {
         if (string.IsNullOrWhiteSpace(userId))
             throw new ValidationException("User id is required.");
 
-        return await repo.GetByUserId(userId);
+        var user = await userRepo.GetById(userId);
+        var requests = await repo.GetByUserId(userId);
+
+        return requests.Select(r => ToDto(r, user?.Username ?? "Unknown")).ToList();
     }
 
     public async Task<HolidayRequest> GetById(Guid id)
@@ -62,6 +78,18 @@ public class RequestService(
 
         await repo.Insert(request);
     }
+    
+    private static HolidayRequestDto ToDto(HolidayRequest request, string username) => new()
+    {
+        Id = request.Id,
+        UserName = username,
+        CreatedAt = request.CreatedAt,
+        StartDate = request.StartDate,
+        EndDate = request.EndDate,
+        Status = request.Status,
+        RejectionReason = request.RejectionReason,
+        CancellationReason = request.CancellationReason
+    };
 
     private async Task<bool> IsOverlapAsync(string userId, DateOnly startDate, DateOnly endDate)
     {
@@ -74,7 +102,10 @@ public class RequestService(
             endDate >= request.StartDate);
     }
 
-    public async Task UpdateRequestStatusAsync(Guid requestId, HolidayRequestStatus status)
+    public async Task UpdateRequestStatusAsync(
+        Guid requestId,
+        HolidayRequestStatus status,
+        string? rejectionReason = null)
     {
         if (status != HolidayRequestStatus.Approved &&
             status != HolidayRequestStatus.Rejected)
@@ -87,7 +118,18 @@ public class RequestService(
 
         if (status == HolidayRequestStatus.Rejected)
         {
+            // The employee must be told why, so a reason is required
+            var reason = rejectionReason?.Trim();
+
+            if (string.IsNullOrEmpty(reason))
+                throw new ValidationException("A rejection reason is required.");
+
+            if (reason.Length > MaxRejectionReasonLength)
+                throw new ValidationException(
+                    $"The rejection reason can be at most {MaxRejectionReasonLength} characters.");
+
             request.Status = HolidayRequestStatus.Rejected;
+            request.RejectionReason = reason; // saved in the database
             await repo.Update(request);
             return;
         }
