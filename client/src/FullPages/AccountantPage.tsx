@@ -1,5 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import {AccountOverview} from "@/Components/AccountComponents/AccountOverview.tsx";
+import {HolidayRequestList} from "@/Components/RequestComponents/HolidayRequestList.tsx";
 
 
 export function AccountantPage(){
@@ -18,6 +19,7 @@ export function AccountantPage(){
             </header>
 
             <AccountOverview/>
+            <HolidayRequestList/>
 
         </main>
     );

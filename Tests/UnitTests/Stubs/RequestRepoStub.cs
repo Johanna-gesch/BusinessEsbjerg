@@ -29,6 +29,8 @@ public class RequestRepoStub : IRequestRepo
             existingRequest.StartDate = request.StartDate;
             existingRequest.EndDate = request.EndDate;
             existingRequest.Status = request.Status;
+            existingRequest.RejectionReason = request.RejectionReason;      
+            existingRequest.CancellationReason = request.CancellationReason; 
         }
 
         return Task.CompletedTask;
