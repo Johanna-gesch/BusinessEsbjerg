@@ -191,9 +191,6 @@ public class RequestService(
                 transaction.Description =
                     $"Holiday request ({request.StartDate:dd-MM-yyyy} to {request.EndDate:dd-MM-yyyy})";
                 
-                Console.WriteLine($"Request ID: {request.Id}");
-                Console.WriteLine($"Transaction ID: {transaction.Id}");
-                Console.WriteLine($"Holiday Request ID on transaction: {transaction.HolidayRequestId}");
                 await transactionRepo.Insert(transaction);
             }
 

@@ -5,7 +5,6 @@ import { UserRole} from "@/api/Api.ts";
 import type {LoggedInUser} from "@/Interfaces/LoggedInUser.tsx";
 import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkScheduleCard.tsx";
 import {EarningsComponent} from "@/Components/EarningsComponent/EarningsComponent.tsx";
-import { AccountList } from "@/Components/AccountComponents/AccountList.tsx";
 import {MyHolidayRequests} from "@/Components/RequestComponents/MyHolidayRequests.tsx";
 import {TransactionHistory} from "@/Components/TransactionHistory.tsx";
 
@@ -53,8 +52,6 @@ export function Dashboard() {
 
             <section className="dashboard-transactions">
                 <h2>Holiday transactions</h2>
-                <AccountList userId={user.userId} />
-
                 <TransactionHistory userId={user.userId} />
             </section>
 
