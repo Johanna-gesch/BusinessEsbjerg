@@ -123,7 +123,7 @@ export interface UserEarningsDto {
 export interface HolidayRequestDto {
   /** @format guid */
   id: string;
-  userId: string;
+  userName: string;
   /** @format date-time */
   createdAt: string;
   /** @format date */
@@ -132,6 +132,7 @@ export interface HolidayRequestDto {
   endDate: string;
   status: HolidayRequestStatus;
   rejectionReason?: string | null;
+  cancellationReason?: string | null;
 }
 
 export interface CreateRequestDto {
@@ -286,6 +287,7 @@ export interface RequestUpdateRequestStatusParams {
   /** @format guid */
   requestId?: string;
   status?: HolidayRequestStatus;
+  rejectionReason?: string | null;
 }
 
 export interface RequestCancelRequestParams {

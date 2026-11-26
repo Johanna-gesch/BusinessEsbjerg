@@ -4,6 +4,7 @@ using Infra.Entities.HolidayTracking.Accounts;
 using Infra.Entities.HolidayTracking.Earnings;
 using Infra.Entities.HolidayTracking.Requests;
 using Infra.Entities.HolidayTracking.WorkSchedule;
+using Infra.Entities.Users;
 using Service.DTOs.RequestDTOs;
 using Service.HolidayServices;
 using Service.HolidayServices.Earnings;
@@ -55,6 +56,7 @@ public class RequestServiceTests
             _balanceService,
             calendarDayService,
             _transactionRepoStub,
+            _userRepoStub,
             _unitOfWorkStub);
     }
 
@@ -148,6 +150,46 @@ public class RequestServiceTests
     public async Task GetById_EmptyId_ThrowsValidationException()
     {
         await Assert.ThrowsAsync<ValidationException>(() => _requestService.GetById(Guid.Empty));
+    }
+    
+    [Fact]
+    public async Task GetAllRequests_ReturnsUsernameInsteadOfUserId()
+    {
+        await _userRepoStub.Insert(new User { UserId = "user123", Username = "Malthe" });
+        await _repoStub.Insert(CreateRequest()); // CreateRequest uses UserId "user123"
+
+        var result = await _requestService.GetAllRequests();
+
+        Assert.Equal("Malthe", Assert.Single(result).UserName);
+    }
+    
+    [Fact]
+    public async Task GetAllRequests_PendingFirst_ThenNewestFirst()
+    {
+        var approvedNew = CreateRequest();
+        approvedNew.Status = HolidayRequestStatus.Approved;
+        approvedNew.CreatedAt = new DateTime(2026, 11, 20);
+
+        var pendingOld = CreateRequest();
+        pendingOld.CreatedAt = new DateTime(2026, 11, 1);
+
+        var rejectedOld = CreateRequest();
+        rejectedOld.Status = HolidayRequestStatus.Rejected;
+        rejectedOld.CreatedAt = new DateTime(2026, 11, 10);
+
+        var pendingNew = CreateRequest();
+        pendingNew.CreatedAt = new DateTime(2026, 11, 15);
+
+        // Insert in a mixed order on purpose
+        await _repoStub.Insert(approvedNew);
+        await _repoStub.Insert(pendingOld);
+        await _repoStub.Insert(rejectedOld);
+        await _repoStub.Insert(pendingNew);
+
+        var result = await _requestService.GetAllRequests();
+
+        var expected = new List<Guid> { pendingNew.Id, pendingOld.Id, approvedNew.Id, rejectedOld.Id };
+        Assert.Equal(expected, result.Select(r => r.Id).ToList());
     }
 
     #endregion
@@ -538,15 +580,55 @@ public class RequestServiceTests
         // Act
         await _requestService.UpdateRequestStatusAsync(
             request.Id,
-            HolidayRequestStatus.Rejected);
+            HolidayRequestStatus.Rejected,
+            "Not enough staff that week");
 
         // Assert
         var updatedRequest = await _repoStub.GetById(request.Id);
 
         Assert.NotNull(updatedRequest);
-        Assert.Equal(
-            HolidayRequestStatus.Rejected,
-            updatedRequest.Status);
+        Assert.Equal(HolidayRequestStatus.Rejected, updatedRequest.Status);
+    }
+    
+    [Fact]
+    public async Task Update_RejectWithReason_SavesTrimmedReason()
+    {
+        var request = CreateRequest();
+        await _repoStub.Insert(request);
+
+        await _requestService.UpdateRequestStatusAsync(
+            request.Id, HolidayRequestStatus.Rejected, "  Too many people are off  ");
+
+        var updated = await _repoStub.GetById(request.Id);
+        Assert.Equal("Too many people are off", updated!.RejectionReason);
+    }
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Update_RejectWithoutReason_ThrowsAndStaysPending(string? reason)
+    {
+        var request = CreateRequest();
+        await _repoStub.Insert(request);
+
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            _requestService.UpdateRequestStatusAsync(
+                request.Id, HolidayRequestStatus.Rejected, reason));
+
+        var unchanged = await _repoStub.GetById(request.Id);
+        Assert.Equal(HolidayRequestStatus.Pending, unchanged!.Status);
+    }
+    
+    [Fact]
+    public async Task Update_RejectWithTooLongReason_ThrowsValidationException()
+    {
+        var request = CreateRequest();
+        await _repoStub.Insert(request);
+
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            _requestService.UpdateRequestStatusAsync(
+                request.Id, HolidayRequestStatus.Rejected, new string('x', 256)));
     }
 
     [Fact]
