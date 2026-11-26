@@ -51,7 +51,7 @@ public class RequestController(RequestService requestService) : ControllerBase
         await requestService.UpdateRequestStatusAsync(requestId, status, rejectionReason);
         return NoContent();
     }
-
+    
     [HttpPut(nameof(CancelRequest))]
     public async Task<IActionResult> CancelRequest(Guid requestId)
     {
