@@ -76,6 +76,8 @@ export interface HolidayTransaction {
   holidayAccountId: string;
   /** @format guid */
   holidayEarningId?: string | null;
+  /** @format guid */
+  holidayRequestId?: string | null;
   /** @format decimal */
   amountHours: number;
   /** @format date */
@@ -175,6 +177,8 @@ export interface HolidayTransactionDto {
   holidayAccountId: string;
   /** @format guid */
   holidayEarningId?: string | null;
+  /** @format guid */
+  holidayRequestId?: string | null;
   /** @format decimal */
   amountHours: number;
   /** @format date */
@@ -194,6 +198,17 @@ export interface CreateHolidayTransactionDto {
   transactionDate: string;
   transactionType: HolidayTransactionType;
   description?: string | null;
+}
+
+export interface HolidayTransactionOverviewDto {
+  /** @format guid */
+  id: string;
+  /** @format date */
+  transactionDate: string;
+  transactionType: HolidayTransactionType;
+  description?: string | null;
+  /** @format decimal */
+  amountHours: number;
 }
 
 export interface CreateUserDto {
@@ -860,6 +875,24 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  getTransactionHistoryForUser = {
+    /**
+     * No description
+     *
+     * @tags Transaction
+     * @name TransactionGetTransactionHistoryForUser
+     * @request GET:/GetTransactionHistoryForUser
+     * @secure
+     */
+    transactionGetTransactionHistoryForUser: (params: RequestParams = {}) =>
+      this.request<HolidayTransactionOverviewDto[], any>({
+        path: `/GetTransactionHistoryForUser`,
+        method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),

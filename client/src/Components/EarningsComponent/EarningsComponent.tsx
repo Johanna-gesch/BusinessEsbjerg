@@ -46,6 +46,8 @@ export function EarningsComponent({user}: EarningsProps) {
         ])
             .then(async ([earningsResult, accounts]: [UserEarningsDto, HolidayAccount[]]) => {
 
+                console.log("Earnings result:", earningsResult);
+                console.log("Accounts result:", accounts);
                 const balanceResults = await Promise.all(
                     accounts.map(async account => ({
                         type: account.type,

@@ -143,6 +143,15 @@ public class RequestService(
         {
             foreach (var transaction in transactions)
             {
+                // Now all allocations belonging to the same request, share the same 
+                // HolidayRequestId.
+                transaction.HolidayRequestId = request.Id;
+                transaction.Description =
+                    $"Holiday request ({request.StartDate:dd-MM-yyyy} to {request.EndDate:dd-MM-yyyy})";
+                
+                Console.WriteLine($"Request ID: {request.Id}");
+                Console.WriteLine($"Transaction ID: {transaction.Id}");
+                Console.WriteLine($"Holiday Request ID on transaction: {transaction.HolidayRequestId}");
                 await transactionRepo.Insert(transaction);
             }
 

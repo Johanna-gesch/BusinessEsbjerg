@@ -1,6 +1,6 @@
 
 import {
-    type HolidayTransaction,
+    type HolidayTransaction, type HolidayTransactionOverviewDto,
     HolidayTransactionType,
     HolidayType
 } from "@/api/Api.ts";
@@ -8,9 +8,7 @@ import apiClient from "@/services/ApiClient.ts";
 import {useEffect, useState} from "react";
 
 type TransactionHistoryProps = {
-    accountId: string;
     userId: string;
-    accountType: HolidayType;
 };
 
 const MyApi = apiClient.api;
@@ -29,6 +27,8 @@ function getTypeName(type: HolidayTransactionType): string {
             return "PaidOut";
         case HolidayTransactionType.Adjustment:
             return "Adjustment";
+        default:
+            return "Unknown";
     }
 }
 
@@ -42,40 +42,22 @@ function formatHours(hours: number): string {
     }).format(hours);
 }
 
-export function TransactionHistory({
-                                       accountId,
-                                       userId,
-                                       accountType
-                                   }: TransactionHistoryProps) {
-    const [transactions, setTransactions] = useState<HolidayTransaction[]>([]);
-    const [accruedHours, setAccruedHours] = useState(0);
+export function TransactionHistory({ userId }: TransactionHistoryProps) {
+    const [transactions, setTransactions] = useState<HolidayTransactionOverviewDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
     useEffect(() => {
         let active = true;
 
         setLoading(true);
         setError("");
 
-        Promise.all([
-            MyApi.getTransactionHistory
-                .transactionGetTransactionHistory({accountId}),
-
-            MyApi.getEarningsForUser
-                .earningGetEarningsForUser({userId})
-        ])
-            .then(([transactionResult, earningsResult]) => {
-                if (!active) return;
-
-                setTransactions(transactionResult);
-
-                const earnedHours =
-                    accountType === HolidayType.Week15
-                        ? earningsResult.availableWeek1_5Hours
-                        : earningsResult.availableWeek6Hours;
-
-                setAccruedHours(earnedHours);
+        MyApi.getTransactionHistoryForUser
+            .transactionGetTransactionHistoryForUser()
+            .then(result => {
+                if (active) {
+                    setTransactions(result);
+                }
             })
             .catch(error => {
                 console.error("Could not load transaction history:", error);
@@ -93,10 +75,10 @@ export function TransactionHistory({
         return () => {
             active = false;
         };
-    }, [accountId, userId, accountType]);
+    }, [userId]);
 
     if (loading) {
-        return <p>Loading Transactions...</p>;
+        return <p>Loading transactions...</p>;
     }
 
     if (error) {
@@ -106,8 +88,6 @@ export function TransactionHistory({
     return (
         <section className="transaction-history">
             <h2>Transaction history</h2>
-
-            <p>Total accrued: {formatHours(accruedHours)} timer</p>
 
             {transactions.length === 0 ? (
                 <p>There are no transactions yet.</p>
@@ -121,6 +101,7 @@ export function TransactionHistory({
                         <th>Hours</th>
                     </tr>
                     </thead>
+
                     <tbody>
                     {transactions.map(transaction => (
                         <tr key={transaction.id}>

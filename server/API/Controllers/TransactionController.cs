@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTOs.TransactionDTOs;
@@ -20,5 +21,18 @@ public class TransactionController (TransactionService service) : ControllerBase
     public async Task<ActionResult<HolidayTransactionDto>> CreateTransaction([FromBody]CreateHolidayTransactionDto dto)
     {
         return Ok(await service.Create(dto));
+    }
+    
+    [Authorize]
+    [HttpGet(nameof(GetTransactionHistoryForUser))]
+    public async Task<ActionResult<List<HolidayTransactionOverviewDto>>>
+        GetTransactionHistoryForUser()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+            return Unauthorized();
+
+        return Ok(await service.GetUserHistory(userId));
     }
 }

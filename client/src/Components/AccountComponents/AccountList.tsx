@@ -61,7 +61,6 @@ export function AccountList({ userId }: AccountListProps) {
                 <AccountCard
                     key={account.id}
                     account={account}
-                    userId={userId}
                 />
             ))}
         </div>
