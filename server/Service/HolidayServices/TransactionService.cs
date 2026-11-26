@@ -23,6 +23,66 @@ public class TransactionService(
         return transactions.Select(ToDto).ToList();
     }
 
+    
+    public async Task<List<HolidayTransactionOverviewDto>> GetUserHistory(string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ValidationException("User id is required.");
+
+        var accounts = await accountRepo.GetUserAccountsAsync(userId);
+
+        var transactions = new List<HolidayTransaction>();
+
+        foreach (var account in accounts)
+        {
+            var accountTransactions = await transactionRepo.GetByAccount(account.Id);
+            transactions.AddRange(accountTransactions);
+        }
+
+        var overview = new List<HolidayTransactionOverviewDto>();
+
+        // Group used transactions belonging to the same holiday request.
+        var groupedTransactions = transactions
+            .Where(t =>
+                t.TransactionType == HolidayTransactionType.Used &&
+                t.HolidayRequestId != null)
+            .GroupBy(t => t.HolidayRequestId);
+
+        foreach (var group in groupedTransactions)
+        {
+            var firstTransaction = group.First();
+
+            overview.Add(new HolidayTransactionOverviewDto
+            {
+                Id = group.Key!.Value,
+                TransactionDate = firstTransaction.TransactionDate,
+                TransactionType = HolidayTransactionType.Used,
+                Description = firstTransaction.Description,
+                AmountHours = group.Sum(t => t.AmountHours)
+            });
+        }
+
+        // Keep transactions that don't belong to a holiday request separate.
+        var individualTransactions = transactions
+            .Where(t =>
+                t.TransactionType != HolidayTransactionType.Used ||
+                t.HolidayRequestId == null);
+
+        overview.AddRange(individualTransactions.Select(t =>
+            new HolidayTransactionOverviewDto
+            {
+                Id = t.Id,
+                TransactionDate = t.TransactionDate,
+                TransactionType = t.TransactionType,
+                Description = t.Description,
+                AmountHours = t.AmountHours
+            }));
+
+        return overview
+            .OrderByDescending(t => t.TransactionDate)
+            .ToList();
+    }
+
     // Validates the request, creates and saves a transaction entity,
     // then converts it to a DTO for the response.
     public async Task<HolidayTransactionDto> Create(CreateHolidayTransactionDto dto)
@@ -83,6 +143,7 @@ public class TransactionService(
         Id = t.Id,
         HolidayAccountId = t.HolidayAccountId,
         HolidayEarningId = t.HolidayEarningId,
+        HolidayRequestId = t.HolidayRequestId,
         AmountHours = t.AmountHours,
         TransactionDate = t.TransactionDate,
         TransactionType = t.TransactionType,
