@@ -37,6 +37,7 @@ public class UserController(UserService service, IAuthenticationService authenti
         await service.Update(dto);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete(nameof(DeleteUser))]
     public async Task DeleteUser(string userId)
     {

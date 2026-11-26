@@ -10,6 +10,7 @@ namespace API.Controllers;
 
 public class RequestController(RequestService requestService) : ControllerBase
 {
+    [Authorize(Roles = nameof(UserRole.Accountant))]
     [HttpGet(nameof(GetAllRequests))]
     public async Task<List<HolidayRequest>> GetAllRequests()
     {
@@ -50,7 +51,7 @@ public class RequestController(RequestService requestService) : ControllerBase
 
         return NoContent();
     }
-
+    
     [HttpPut(nameof(CancelRequest))]
     public async Task<IActionResult> CancelRequest(Guid requestId)
     {
