@@ -45,10 +45,10 @@ public class RequestController(RequestService requestService) : ControllerBase
 
     [Authorize(Roles = nameof(UserRole.Accountant))]
     [HttpPut(nameof(UpdateRequestStatus))]
-    public async Task<IActionResult> UpdateRequestStatus(Guid requestId, HolidayRequestStatus status)
+    public async Task<IActionResult> UpdateRequestStatus(
+        Guid requestId, HolidayRequestStatus status, string? rejectionReason = null)
     {
-        await requestService.UpdateRequestStatusAsync(requestId, status);
-
+        await requestService.UpdateRequestStatusAsync(requestId, status, rejectionReason);
         return NoContent();
     }
 
