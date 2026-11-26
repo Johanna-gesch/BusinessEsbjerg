@@ -6,6 +6,7 @@ import type {LoggedInUser} from "@/Interfaces/LoggedInUser.tsx";
 import {WorkScheduleCard} from "@/Components/WorkScheduleComponents/WorkScheduleCard.tsx";
 import {EarningsComponent} from "@/Components/EarningsComponent/EarningsComponent.tsx";
 import { AccountList } from "@/Components/AccountComponents/AccountList.tsx";
+import {MyHolidayRequests} from "@/Components/RequestComponents/MyHolidayRequests.tsx";
 
 export function Dashboard() {
     const navigate = useNavigate();
@@ -53,6 +54,8 @@ export function Dashboard() {
                 <h2>Holiday transactions</h2>
                 <AccountList userId={user.userId} />
             </section>
+
+            <MyHolidayRequests />
         </main>
     );
 }
